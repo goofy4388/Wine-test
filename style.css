@@ -175,3 +175,43 @@ input:focus{border-color:#ffffff45; box-shadow:0 0 0 3px #6ee7ff22}
 .tileValue{font-weight:900;font-size:18px;margin-top:6px}
 
 .foot{margin-top:16px;text-align:center}
+/* ===== Quiz answer spacing & layout fix ===== */
+
+.choiceRow{
+  display:flex;
+  gap:12px;
+  align-items:flex-start;
+  padding:14px 14px;
+  border-radius:14px;
+  border:1px solid rgba(255,255,255,.15);
+  background: rgba(255,255,255,.06);
+  margin:10px 0;
+  cursor:pointer;
+}
+
+.choiceRow input{
+  margin-top: 4px;
+  transform: scale(1.15);
+}
+
+.choiceText{
+  line-height:1.35;
+  font-size:1rem;
+}
+
+.qContext{
+  margin-top:10px;
+  font-weight:700;
+  font-size:1.05rem;
+  opacity:.95;
+}
+
+.qPrompt{
+  font-size:1.1rem;
+  font-weight:800;
+}
+
+.qStem{
+  margin-top:6px;
+  opacity:.9;
+}
