@@ -1,421 +1,369 @@
-(() => {
-  const PASSING_PCT = 80; // 80% to pass
-  const REVIEW_MODE_AFTER_FINISH = false; // keep FALSE to never show correct answers
+(function () {
+  "use strict";
 
-  // ============ DOM IDs expected in your HTML ============
-  // startBtn, nameInput
-  // qSection, qNum, qText, choicesWrap, backBtn, nextBtn
-  // resultsSection, rName, rScore, rPct, stamp, restartBtn
-  // If your IDs differ, rename them here.
-  const el = (id) => document.getElementById(id);
+  // ===== DOM =====
+  const startCard   = document.getElementById("startCard");
+  const testCard    = document.getElementById("testCard");
+  const resultsCard = document.getElementById("resultsCard");
 
-  const startBtn = el("startBtn");
-  const nameInput = el("nameInput");
+  const nameInput   = document.getElementById("nameInput");
+  const startBtn    = document.getElementById("startBtn");
+  const resetBtnTop = document.getElementById("resetBtnTop");
 
-  const qSection = el("qSection");
-  const qNum = el("qNum");
-  const qText = el("qText");
-  const choicesWrap = el("choicesWrap");
-  const backBtn = el("backBtn");
-  const nextBtn = el("nextBtn");
+  const whoName      = document.getElementById("whoName");
+  const progressText = document.getElementById("progressText");
+  const qCount       = document.getElementById("qCount");
+  const questionText = document.getElementById("questionText");
+  const optionsForm  = document.getElementById("optionsForm");
 
-  const resultsSection = el("resultsSection");
-  const rName = el("rName");
-  const rScore = el("rScore");
-  const rPct = el("rPct");
-  const stamp = el("stamp");
-  const restartBtn = el("restartBtn");
+  const backBtn   = document.getElementById("backBtn");
+  const nextBtn   = document.getElementById("nextBtn");
+  const finishBtn = document.getElementById("finishBtn");
+  const resetBtn  = document.getElementById("resetBtn");
 
-  // ============ Wine data (from your list) ============
-  // NOTE: This is used only to build harder questions.
-  const WINES = [
-    { n: "Caymus Cabernet Sauvignon (Napa Valley)", t: "Red", g: "Cabernet Sauvignon", r: "Napa Valley, California", c: "USA" },
-    { n: "Stag's Leap Artemis Cabernet Sauvignon", t: "Red", g: "Cabernet Sauvignon", r: "Napa Valley, California", c: "USA" },
-    { n: "J. Lohr 'Seven Oaks' Cabernet Sauvignon", t: "Red", g: "Cabernet Sauvignon", r: "Paso Robles, California", c: "USA" },
-    { n: "DAOU Cabernet Sauvignon", t: "Red", g: "Cabernet Sauvignon", r: "Paso Robles, California", c: "USA" },
-    { n: "Josh Cellars Cabernet Sauvignon", t: "Red", g: "Cabernet Sauvignon", r: "California", c: "USA" },
-    { n: "Beringer Founders' Estate Cabernet Sauvignon", t: "Red", g: "Cabernet Sauvignon", r: "California", c: "USA" },
-    { n: "Coppola Diamond Cabernet Sauvignon", t: "Red", g: "Cabernet Sauvignon", r: "California", c: "USA" },
+  const rName  = document.getElementById("rName");
+  const rScore = document.getElementById("rScore");
+  const rPct   = document.getElementById("rPct");
+  const stamp  = document.getElementById("stamp");
 
-    { n: "Bogle Merlot", t: "Red", g: "Merlot", r: "California", c: "USA" },
-    { n: "Duckhorn 'Decoy' Merlot", t: "Red", g: "Merlot", r: "Sonoma County, California", c: "USA" },
+  const reviewBtn  = document.getElementById("reviewBtn");
+  const restartBtn = document.getElementById("restartBtn");
+  const missedList = document.getElementById("missedList");
+  const reviewWrap = document.getElementById("reviewWrap");
 
-    { n: "The Prisoner Red Blend", t: "Red", g: "Red Blend", r: "California", c: "USA" },
-    { n: "Orin Swift 'Abstract' Red Blend", t: "Red", g: "Red Blend", r: "California", c: "USA" },
-    { n: "DAOU 'Pessimist' Red Blend", t: "Red", g: "Red Blend", r: "California", c: "USA" },
-    { n: "Apothic Red Blend", t: "Red", g: "Red Blend", r: "California", c: "USA" },
-    { n: "Conundrum Red Blend", t: "Red", g: "Red Blend", r: "California", c: "USA" },
+  // ===== SETTINGS =====
+  const PASS_PCT = 80;
+  const KEY = "wine_test_v1";
 
-    { n: "Mark West Pinot Noir", t: "Red", g: "Pinot Noir", r: "California", c: "USA" },
-    { n: "Meiomi Pinot Noir", t: "Red", g: "Pinot Noir", r: "California", c: "USA" },
-    { n: "Belle Glos 'Balade' Pinot Noir", t: "Red", g: "Pinot Noir", r: "California", c: "USA" },
-    { n: "Duckhorn 'Goldeneye' Pinot Noir", t: "Red", g: "Pinot Noir", r: "California", c: "USA" },
+  // ===== QUESTIONS (50) =====
+  // Question text does NOT reveal the answer; answer is stored only in JS.
+  const QUESTIONS = [
+    { q: "Which wine on our list is a Napa Valley Cabernet Sauvignon?", choices: ["Caymus Cabernet Sauvignon","Josh Cellars Cabernet Sauvignon","Mark West Pinot Noir","Santa Margherita Pinot Grigio"], a: 0 },
+    { q: "Which wine is a Super Tuscan from Tuscany?", choices: ["Il Borro 'Pian di Nova'","Riondo Prosecco","Veuve Clicquot Yellow Label","Chateau Ste. Michelle Riesling"], a: 0 },
+    { q: "Which wine is a Sauvignon Blanc from Marlborough, New Zealand?", choices: ["Kim Crawford Sauvignon Blanc","Quilt 'Threadcount' Sauvignon Blanc","Kendall-Jackson Chardonnay","Meomi Pinot Noir"], a: 0 },
+    { q: "Which sparkling wine is a French Champagne on our list?", choices: ["Veuve Clicquot Yellow Label","La Marca Prosecco Rosé","Riondo Prosecco","Fleurs de Prairie Rosé"], a: 0 },
+    { q: "Which wine is a Prosecco from Italy?", choices: ["Riondo Prosecco","Duckhorn 'Decoy' Merlot","DAOU Cabernet Sauvignon","The Prisoner Red Blend"], a: 0 },
 
-    { n: "Riondo Prosecco", t: "Sparkling", g: "Prosecco (Glera)", r: "Italy", c: "Italy" },
-    { n: "LaMarca Prosecco Rosé", t: "Sparkling", g: "Prosecco Rosé", r: "Italy", c: "Italy" },
-    { n: "Veuve Clicquot Yellow Label Brut", t: "Sparkling", g: "Champagne Blend", r: "France", c: "France" },
+    { q: "Which wine is a Prosecco Rosé?", choices: ["La Marca Prosecco Rosé","Rombauer Chardonnay","Bogle Merlot","Coppola Diamond Cabernet Sauvignon"], a: 0 },
+    { q: "Which wine is a Riesling from Washington State?", choices: ["Chateau Ste. Michelle Riesling","Ecco Domani Pinot Grigio","Conundrum Red Blend","Allegrini Valpolicella"], a: 0 },
+    { q: "Which wine is commonly categorized as a sweet Moscato?", choices: ["Seven Daughters Moscato","Josh Cellars Cabernet Sauvignon","Duckhorn 'Goldeneye' Pinot Noir","Orin Swift 'Abstract'"], a: 0 },
+    { q: "Which wine is a White Zinfandel from California?", choices: ["Copper Ridge White Zinfandel","Belle Glos 'Balade' Pinot Noir","DAOU 'Pessimist'","J. Lohr 'Seven Oaks'"], a: 0 },
+    { q: "Which wine is a Rosé from France on our list?", choices: ["Fleurs de Prairie Rosé","Bonizio Bianco by Cecchi","Kendall-Jackson Chardonnay","Josh Cellars Cabernet Sauvignon"], a: 0 },
 
-    { n: "Seven Daughters Moscato", t: "White", g: "Moscato", r: "Italy", c: "Italy" },
-    { n: "Copper Ridge White Zinfandel", t: "Rosé", g: "White Zinfandel", r: "California", c: "USA" },
-    { n: "Chateau Ste. Michelle Riesling", t: "White", g: "Riesling", r: "Washington", c: "USA" },
-    { n: "Fleurs de Prairie Rosé", t: "Rosé", g: "Rosé Blend", r: "France", c: "France" },
+    { q: "Which wine is an Italian Pinot Grigio often considered a premium by-the-glass choice?", choices: ["Santa Margherita Pinot Grigio","Mark West Pinot Noir","Beringer Founders' Estate","Conundrum Red Blend"], a: 0 },
+    { q: "Which wine is a Pinot Grigio from Italy (popular label)?", choices: ["Ecco Domani Pinot Grigio","Stag's Leap Artemis","Duckhorn 'Goldeneye' Pinot Noir","The Prisoner Red Blend"], a: 0 },
+    { q: "Which wine is a Pinot Grigio from Italy with a short brand label name?", choices: ["Chloe Pinot Grigio","DAOU Cabernet Sauvignon","Bogle Merlot","Riondo Prosecco"], a: 0 },
+    { q: "Which wine is the Sauvignon Blanc labeled 'Threadcount'?", choices: ["Quilt 'Threadcount' Sauvignon Blanc","Kim Crawford Sauvignon Blanc","Imagery Sauvignon Blanc","Seven Daughters Moscato"], a: 0 },
+    { q: "Which wine is a Sauvignon Blanc from Sonoma on our list?", choices: ["Imagery Sauvignon Blanc","Veuve Clicquot Yellow Label","Allegrini Valpolicella","Rombauer Chardonnay"], a: 0 },
 
-    { n: "Ecco Domani Pinot Grigio", t: "White", g: "Pinot Grigio", r: "Italy", c: "Italy" },
-    { n: "Chloe Pinot Grigio", t: "White", g: "Pinot Grigio", r: "Italy", c: "Italy" },
-    { n: "Santa Margherita Pinot Grigio", t: "White", g: "Pinot Grigio", r: "Italy", c: "Italy" },
-    { n: "Bonizio Bianco by Cecchi", t: "White", g: "Italian White Blend", r: "Tuscany, Italy", c: "Italy" },
+    { q: "Which wine is a Chardonnay from Italy (Antinori family)?", choices: ["Antinori 'Tormaresca'","William Hill Chardonnay","Kendall-Jackson Chardonnay","Rombauer Chardonnay"], a: 0 },
+    { q: "Which Chardonnay on our list is a widely known California brand often described as balanced?", choices: ["Kendall-Jackson Chardonnay","Allegrini Valpolicella","Riondo Prosecco","Ruffino Chianti DOCG"], a: 0 },
+    { q: "Which Chardonnay is known for a richer style and is usually priced higher?", choices: ["Rombauer Chardonnay","Copper Ridge White Zinfandel","Fleurs de Prairie Rosé","Conundrum Red Blend"], a: 0 },
+    { q: "Which Chardonnay is from California and is a classic, clean option?", choices: ["William Hill Chardonnay","Duckhorn 'Goldeneye' Pinot Noir","Cecchi Chianti Classico","DAOU Cabernet Sauvignon"], a: 0 },
+    { q: "Which Pinot Noir is typically considered an entry-level California option?", choices: ["Mark West Pinot Noir","Duckhorn 'Decoy' Merlot","Il Borro 'Pian di Nova'","Veuve Clicquot Yellow Label"], a: 0 },
 
-    { n: "Imagery Sauvignon Blanc", t: "White", g: "Sauvignon Blanc", r: "Sonoma, California", c: "USA" },
-    { n: "Quilt 'Threadcount' Sauvignon Blanc", t: "White", g: "Sauvignon Blanc", r: "California", c: "USA" },
-    { n: "Kim Crawford Sauvignon Blanc", t: "White", g: "Sauvignon Blanc", r: "New Zealand", c: "New Zealand" },
+    { q: "Which Pinot Noir on our list is often recognized as fuller and fruit-forward?", choices: ["Meomi Pinot Noir","Chateau Ste. Michelle Riesling","Bonizio Bianco by Cecchi","Josh Cellars Cabernet Sauvignon"], a: 0 },
+    { q: "Which Pinot Noir is associated with Anderson Valley and a premium producer?", choices: ["Duckhorn 'Goldeneye' Pinot Noir","Beringer Founders' Estate","Copper Ridge White Zinfandel","Riondo Prosecco"], a: 0 },
+    { q: "Which Pinot Noir is a Belle Glos label?", choices: ["Belle Glos 'Balade' Pinot Noir","The Prisoner Red Blend","DAOU 'Pessimist'","Santa Margherita Pinot Grigio"], a: 0 },
+    { q: "Which red is a Merlot from California on our list?", choices: ["Bogle Merlot","Allegrini Valpolicella","Ruffino Chianti DOCG","Veuve Clicquot Yellow Label"], a: 0 },
+    { q: "Which Merlot is the Duckhorn 'Decoy' label?", choices: ["Duckhorn 'Decoy' Merlot","Orin Swift 'Abstract'","Il Borro 'Pian di Nova'","Kendall-Jackson Chardonnay"], a: 0 },
 
-    { n: "Antinori 'Tormaresca' (Chardonnay)", t: "White", g: "Chardonnay", r: "Italy", c: "Italy" },
-    { n: "William Hill Chardonnay", t: "White", g: "Chardonnay", r: "California", c: "USA" },
-    { n: "Kendall-Jackson Chardonnay", t: "White", g: "Chardonnay", r: "California", c: "USA" },
-    { n: "Rombauer Chardonnay", t: "White", g: "Chardonnay", r: "California", c: "USA" },
+    { q: "Which red blend is famously known as a bold California blend brand?", choices: ["The Prisoner Red Blend","Chloe Pinot Grigio","Riondo Prosecco","Chateau Ste. Michelle Riesling"], a: 0 },
+    { q: "Which red blend is labeled 'Abstract'?", choices: ["Orin Swift 'Abstract' Red Blend","Conundrum Red Blend","Apothic Red Blend","The Prisoner Red Blend"], a: 0 },
+    { q: "Which red blend is labeled 'Pessimist'?", choices: ["DAOU 'Pessimist' Red Blend","Conundrum Red Blend","Apothic Red Blend","The Prisoner Red Blend"], a: 0 },
+    { q: "Which red blend is a value-focused California brand?", choices: ["Apothic Red Blend","Cecchi Chianti Classico","Allegrini Valpolicella","Il Borro 'Pian di Nova'"], a: 0 },
+    { q: "Which red blend name is often recognized as a versatile California blend?", choices: ["Conundrum Red Blend","Riondo Prosecco","Fleurs de Prairie Rosé","Copper Ridge White Zinfandel"], a: 0 },
 
-    { n: "Allegrini Valpolicella", t: "Red", g: "Valpolicella Blend", r: "Verona, Italy", c: "Italy" },
-    { n: "Ruffino Chianti DOCG", t: "Red", g: "Sangiovese (Chianti)", r: "Tuscany, Italy", c: "Italy" },
-    { n: "Cecchi Chianti Classico", t: "Red", g: "Sangiovese (Chianti Classico)", r: "Tuscany, Italy", c: "Italy" },
-    { n: "Bonizio Rosso by Cecchi", t: "Red", g: "Italian Red Blend", r: "Italy", c: "Italy" },
-    { n: "Il Borro 'Pian di Nova' (Super Tuscan)", t: "Red", g: "Super Tuscan Blend", r: "Tuscany, Italy", c: "Italy" },
+    { q: "Which Italian red is a Valpolicella from Verona?", choices: ["Allegrini Valpolicella","Coppola Diamond Cabernet Sauvignon","Josh Cellars Cabernet Sauvignon","DAOU Cabernet Sauvignon"], a: 0 },
+    { q: "Which Italian red is a Chianti DOCG?", choices: ["Ruffino Chianti DOCG","Bogle Merlot","Rombauer Chardonnay","Kim Crawford Sauvignon Blanc"], a: 0 },
+    { q: "Which Italian red is a Chianti Classico?", choices: ["Cecchi Chianti Classico","Conundrum Red Blend","Mark West Pinot Noir","Seven Daughters Moscato"], a: 0 },
+    { q: "Which Italian red blend is labeled 'Bonizio Rosso by Cecchi'?", choices: ["Bonizio Rosso by Cecchi","Bonizio Bianco by Cecchi","Il Borro 'Pian di Nova'","Allegrini Valpolicella"], a: 0 },
+    { q: "Which Cabernet Sauvignon is a common value brand in many restaurants?", choices: ["Beringer Founders' Estate Cabernet Sauvignon","Stag's Leap Artemis","Caymus Cabernet Sauvignon","Veuve Clicquot Yellow Label"], a: 0 },
+
+    { q: "Which Cabernet Sauvignon is Josh Cellars?", choices: ["Josh Cellars Cabernet Sauvignon","Coppola Diamond Cabernet Sauvignon","J. Lohr 'Seven Oaks' Cabernet Sauvignon","DAOU Cabernet Sauvignon"], a: 0 },
+    { q: "Which Cabernet Sauvignon is Coppola Diamond?", choices: ["Coppola Diamond Cabernet Sauvignon","Josh Cellars Cabernet Sauvignon","Beringer Founders' Estate Cabernet Sauvignon","DAOU Cabernet Sauvignon"], a: 0 },
+    { q: "Which Cabernet Sauvignon is 'Seven Oaks' from Paso Robles?", choices: ["J. Lohr 'Seven Oaks' Cabernet Sauvignon","Stag's Leap Artemis","Caymus Cabernet Sauvignon","Beringer Founders' Estate Cabernet Sauvignon"], a: 0 },
+    { q: "Which Cabernet Sauvignon is a premium Napa bottle named after a Greek goddess?", choices: ["Stag's Leap Artemis","Caymus Cabernet Sauvignon","Josh Cellars Cabernet Sauvignon","Coppola Diamond Cabernet Sauvignon"], a: 0 },
+    { q: "Which Cabernet Sauvignon is associated with Paso Robles and a sleek modern brand?", choices: ["DAOU Cabernet Sauvignon","Beringer Founders' Estate Cabernet Sauvignon","Josh Cellars Cabernet Sauvignon","Coppola Diamond Cabernet Sauvignon"], a: 0 },
+
+    { q: "Which wine is an Italian white blend labeled 'Bonizio Bianco by Cecchi'?", choices: ["Bonizio Bianco by Cecchi","Bonizio Rosso by Cecchi","Chloe Pinot Grigio","Ecco Domani Pinot Grigio"], a: 0 },
+    { q: "Which of these is a sparkling option (not still wine)?", choices: ["Veuve Clicquot Yellow Label","Meomi Pinot Noir","Bogle Merlot","DAOU Cabernet Sauvignon"], a: 0 },
+    { q: "Which of these is most likely served chilled and categorized as rosé?", choices: ["Fleurs de Prairie Rosé","The Prisoner Red Blend","Coppola Diamond Cabernet Sauvignon","Allegrini Valpolicella"], a: 0 },
+    { q: "Which option is a Pinot Noir (not a blend or Cabernet)?", choices: ["Meomi Pinot Noir","Apothic Red Blend","Conundrum Red Blend","Josh Cellars Cabernet Sauvignon"], a: 0 },
+    { q: "Which option is a Pinot Grigio (not Sauvignon Blanc)?", choices: ["Santa Margherita Pinot Grigio","Kim Crawford Sauvignon Blanc","Imagery Sauvignon Blanc","Quilt 'Threadcount' Sauvignon Blanc"], a: 0 },
+
+    { q: "Which option is a Sauvignon Blanc (not Chardonnay)?", choices: ["Kim Crawford Sauvignon Blanc","Kendall-Jackson Chardonnay","William Hill Chardonnay","Rombauer Chardonnay"], a: 0 },
+    { q: "Which option is typically categorized as a sweet wine style?", choices: ["Seven Daughters Moscato","Josh Cellars Cabernet Sauvignon","Allegrini Valpolicella","Duckhorn 'Goldeneye' Pinot Noir"], a: 0 },
+    { q: "Which option is clearly an Italian classification you might see on a wine list?", choices: ["Chianti DOCG","Cabernet Sauvignon","Pinot Noir","Sauvignon Blanc"], a: 0 },
+    { q: "Which option is a Napa Valley Cabernet Sauvignon in the premium tier?", choices: ["Caymus Cabernet Sauvignon","Beringer Founders' Estate Cabernet Sauvignon","Josh Cellars Cabernet Sauvignon","J. Lohr 'Seven Oaks' Cabernet Sauvignon"], a: 0 },
+    { q: "Which option is a bold red blend brand known for strong label recognition?", choices: ["The Prisoner Red Blend","Ecco Domani Pinot Grigio","Chateau Ste. Michelle Riesling","Riondo Prosecco"], a: 0 }
   ];
 
-  // ============ Helper utilities ============
-  const shuffle = (arr) => {
+  // ===== STATE =====
+  let order = [];
+  let current = 0;
+  let answers = [];
+  let testName = "";
+
+  // per-question shuffled choice order (stable when navigating back/next)
+  const answersMeta = new Array(QUESTIONS.length).fill(null);
+
+  // ===== HELPERS =====
+  function shuffle(arr) {
     const a = arr.slice();
     for (let i = a.length - 1; i > 0; i--) {
       const j = Math.floor(Math.random() * (i + 1));
       [a[i], a[j]] = [a[j], a[i]];
     }
     return a;
-  };
-
-  const pick = (arr) => arr[Math.floor(Math.random() * arr.length)];
-
-  const unique = (arr) => [...new Set(arr)];
-
-  const byGrape = (g) => WINES.filter((w) => w.g === g);
-  const byCountry = (c) => WINES.filter((w) => w.c === c);
-  const byType = (t) => WINES.filter((w) => w.t === t);
-
-  // ============ HARDER QUESTION GENERATORS ============
-  // IMPORTANT: Question text never contains the correct answer.
-  // Choices are full statements/pairings so user must KNOW.
-  function qCorrectPairing() {
-    // Choose a wine, then ask which pairing is correct (wine -> grape OR wine -> region OR wine -> type)
-    const w = pick(WINES);
-    const mode = pick(["grape", "region", "type"]);
-
-    const correct =
-      mode === "grape"
-        ? `${w.n} — ${w.g}`
-        : mode === "region"
-        ? `${w.n} — ${w.r}`
-        : `${w.n} — ${w.t}`;
-
-    // Build wrong options by mixing other wines’ attributes
-    const wrongs = unique(
-      shuffle(WINES)
-        .filter((x) => x.n !== w.n)
-        .slice(0, 8)
-        .map((x) => {
-          if (mode === "grape") return `${w.n} — ${x.g}`;
-          if (mode === "region") return `${w.n} — ${x.r}`;
-          return `${w.n} — ${x.t}`;
-        })
-    ).filter((x) => x !== correct);
-
-    const options = shuffle([correct, ...wrongs.slice(0, 3)]);
-    const prompt =
-      mode === "grape"
-        ? "Which pairing is correct?"
-        : mode === "region"
-        ? "Which pairing is correct?"
-        : "Which pairing is correct?";
-
-    return { prompt, stem: `Select the correct match for the wine shown:`, context: w.n, options, answer: correct };
   }
 
-  function qOddOneOut() {
-    // 3 share same grape/type/country; 1 is different
-    const mode = pick(["grape", "type", "country"]);
+  function show(el){ el.classList.remove("hidden"); }
+  function hide(el){ el.classList.add("hidden"); }
 
-    let group = [];
-    let odd = null;
-
-    if (mode === "country") {
-      // Choose a country with >= 3 wines
-      const candidateCountries = unique(WINES.map((w) => w.c)).filter((c) => byCountry(c).length >= 3);
-      const c = pick(candidateCountries);
-      group = shuffle(byCountry(c)).slice(0, 3);
-
-      // odd from different country
-      odd = pick(WINES.filter((w) => w.c !== c));
-    } else if (mode === "type") {
-      const candidateTypes = unique(WINES.map((w) => w.t)).filter((t) => byType(t).length >= 3);
-      const t = pick(candidateTypes);
-      group = shuffle(byType(t)).slice(0, 3);
-      odd = pick(WINES.filter((w) => w.t !== t));
-    } else {
-      const candidateGrapes = unique(WINES.map((w) => w.g)).filter((g) => byGrape(g).length >= 3);
-      const g = pick(candidateGrapes);
-      group = shuffle(byGrape(g)).slice(0, 3);
-      odd = pick(WINES.filter((w) => w.g !== g));
-    }
-
-    const options = shuffle([...group.map((w) => w.n), odd.n]);
-    return {
-      prompt: "Which option does NOT belong with the other three?",
-      stem: "Choose the odd one out.",
-      context: "",
-      options,
-      answer: odd.n
-    };
+  function saveState() {
+    localStorage.setItem(KEY, JSON.stringify({ order, current, answers, testName, answersMeta }));
   }
 
-  function qCategoryCheck() {
-    // Ask: Which list contains ONLY wines from X category (harder because it’s a set)
-    const mode = pick(["ItalyOnly", "SparklingOnly", "CabernetOnly", "PinotGrigioOnly"]);
-    let correctSet = [];
-    let wrongSet1 = [];
-    let wrongSet2 = [];
-    let wrongSet3 = [];
-    let prompt = "Which set is correct?";
-    let stem = "";
-
-    if (mode === "ItalyOnly") {
-      stem = "Pick the set that contains ONLY wines from Italy.";
-      correctSet = shuffle(byCountry("Italy")).slice(0, 3).map((w) => w.n);
-      wrongSet1 = [correctSet[0], correctSet[1], pick(WINES.filter((w) => w.c !== "Italy")).n];
-      wrongSet2 = [correctSet[0], pick(WINES.filter((w) => w.c !== "Italy")).n, pick(WINES.filter((w) => w.c !== "Italy")).n];
-      wrongSet3 = [correctSet[2], pick(WINES.filter((w) => w.c !== "Italy")).n, correctSet[0]];
-    } else if (mode === "SparklingOnly") {
-      stem = "Pick the set that contains ONLY sparkling wines.";
-      correctSet = shuffle(byType("Sparkling")).slice(0, 3).map((w) => w.n);
-      wrongSet1 = [correctSet[0], correctSet[1], pick(WINES.filter((w) => w.t !== "Sparkling")).n];
-      wrongSet2 = [correctSet[0], pick(WINES.filter((w) => w.t !== "Sparkling")).n, pick(WINES.filter((w) => w.t !== "Sparkling")).n];
-      wrongSet3 = [correctSet[2], pick(WINES.filter((w) => w.t !== "Sparkling")).n, correctSet[0]];
-    } else if (mode === "CabernetOnly") {
-      stem = "Pick the set that contains ONLY Cabernet Sauvignon wines.";
-      const cabs = WINES.filter((w) => w.g === "Cabernet Sauvignon");
-      correctSet = shuffle(cabs).slice(0, 3).map((w) => w.n);
-      wrongSet1 = [correctSet[0], correctSet[1], pick(WINES.filter((w) => w.g !== "Cabernet Sauvignon")).n];
-      wrongSet2 = [correctSet[0], pick(WINES.filter((w) => w.g !== "Cabernet Sauvignon")).n, pick(WINES.filter((w) => w.g !== "Cabernet Sauvignon")).n];
-      wrongSet3 = [correctSet[2], pick(WINES.filter((w) => w.g !== "Cabernet Sauvignon")).n, correctSet[0]];
-    } else {
-      stem = "Pick the set that contains ONLY Pinot Grigio wines.";
-      const pgs = WINES.filter((w) => w.g === "Pinot Grigio");
-      correctSet = shuffle(pgs).slice(0, 3).map((w) => w.n);
-      wrongSet1 = [correctSet[0], correctSet[1], pick(WINES.filter((w) => w.g !== "Pinot Grigio")).n];
-      wrongSet2 = [correctSet[0], pick(WINES.filter((w) => w.g !== "Pinot Grigio")).n, pick(WINES.filter((w) => w.g !== "Pinot Grigio")).n];
-      wrongSet3 = [correctSet[2], pick(WINES.filter((w) => w.g !== "Pinot Grigio")).n, correctSet[0]];
-    }
-
-    const packs = shuffle([correctSet, wrongSet1, wrongSet2, wrongSet3]).map((set) => set.join(" • "));
-    const answer = correctSet.join(" • ");
-
-    return { prompt, stem, context: "", options: packs, answer };
-  }
-
-  function buildQuestions50() {
-    const qs = [];
-    while (qs.length < 50) {
-      const gen = pick([qCorrectPairing, qOddOneOut, qCategoryCheck]);
-      const q = gen();
-
-      // Ensure 4 options and unique options
-      q.options = unique(q.options).slice(0, 4);
-      if (q.options.length < 4) continue;
-
-      // Answer must be in options
-      if (!q.options.includes(q.answer)) continue;
-
-      qs.push(q);
-    }
-    return qs;
-  }
-
-  const QUESTIONS = buildQuestions50();
-
-  // ============ STATE ============
-  const KEY = "wine_test_v3";
-  const loadState = () => {
+  function loadState() {
     try {
       const raw = localStorage.getItem(KEY);
-      return raw ? JSON.parse(raw) : null;
+      if (!raw) return false;
+      const data = JSON.parse(raw);
+      if (!data || !Array.isArray(data.order) || data.order.length !== QUESTIONS.length) return false;
+      order = data.order;
+      current = Number.isFinite(data.current) ? data.current : 0;
+      answers = Array.isArray(data.answers) ? data.answers : new Array(QUESTIONS.length).fill(null);
+      testName = (data.testName || "").trim();
+
+      // restore meta if present
+      if (Array.isArray(data.answersMeta) && data.answersMeta.length === QUESTIONS.length) {
+        for (let i = 0; i < QUESTIONS.length; i++) answersMeta[i] = data.answersMeta[i];
+      }
+      return true;
     } catch {
-      return null;
+      return false;
     }
-  };
-  const saveState = () => localStorage.setItem(KEY, JSON.stringify(state));
-
-  let state = loadState() || {
-    name: "",
-    idx: 0,
-    answers: {}, // { [i]: optionString }
-    started: false,
-    finished: false
-  };
-
-  // ============ RENDER ============
-  function show(section) {
-    if (qSection) qSection.style.display = section === "quiz" ? "block" : "none";
-    if (resultsSection) resultsSection.style.display = section === "results" ? "block" : "none";
   }
 
-  function renderQuestion() {
-    const i = state.idx;
-    const q = QUESTIONS[i];
+  function clearState() { localStorage.removeItem(KEY); }
 
-    if (qNum) qNum.textContent = `${i + 1} / ${QUESTIONS.length}`;
-    if (qText) {
-      // HARDER: question text does not contain answer
-      // We optionally show a context line (wine name) for pairing questions
-      const ctx = q.context ? `<div class="qContext">${escapeHTML(q.context)}</div>` : "";
-      qText.innerHTML = `
-        <div class="qPrompt">${escapeHTML(q.prompt)}</div>
-        <div class="qStem">${escapeHTML(q.stem || "")}</div>
-        ${ctx}
-      `;
+  function buildNewTest() {
+    order = shuffle([...Array(QUESTIONS.length).keys()]);
+    current = 0;
+    answers = new Array(QUESTIONS.length).fill(null);
+    for (let i = 0; i < QUESTIONS.length; i++) answersMeta[i] = null;
+  }
+
+  function ensureChoiceOrder(qIndex) {
+    if (answersMeta[qIndex]?.choiceOrder) return answersMeta[qIndex].choiceOrder;
+    const idxs = shuffle([...Array(QUESTIONS[qIndex].choices.length).keys()]);
+    answersMeta[qIndex] = { choiceOrder: idxs };
+    return idxs;
+  }
+
+  function getCorrectDisplayedIndex(qIndex) {
+    const co = ensureChoiceOrder(qIndex);
+    return co.indexOf(QUESTIONS[qIndex].a);
+  }
+
+  function render() {
+    const qIndex = order[current];
+    const q = QUESTIONS[qIndex];
+
+    whoName.textContent = testName || "—";
+    progressText.textContent = `${current + 1}/${QUESTIONS.length}`;
+    qCount.textContent = `${current + 1} of ${QUESTIONS.length}`;
+    questionText.textContent = q.q;
+
+    backBtn.disabled = current === 0;
+    nextBtn.classList.toggle("hidden", current === QUESTIONS.length - 1);
+    finishBtn.classList.toggle("hidden", current !== QUESTIONS.length - 1);
+
+    optionsForm.innerHTML = "";
+
+    const choiceOrder = ensureChoiceOrder(qIndex);
+    const chosenDisplayed = answers[qIndex];
+
+    choiceOrder.forEach((choiceIdx, displayedIdx) => {
+      const id = `opt_${qIndex}_${displayedIdx}`;
+
+      const label = document.createElement("label");
+      label.className = "opt";
+      label.setAttribute("for", id);
+
+      const input = document.createElement("input");
+      input.type = "radio";
+      input.name = `q_${qIndex}`;
+      input.id = id;
+      input.value = String(displayedIdx);
+      input.checked = chosenDisplayed === displayedIdx;
+
+      const span = document.createElement("span");
+      span.className = "optText";
+      span.textContent = q.choices[choiceIdx];
+
+      input.addEventListener("change", () => {
+        answers[qIndex] = displayedIdx; // store displayed index (not raw)
+        saveState();
+      });
+
+      label.appendChild(input);
+      label.appendChild(span);
+      optionsForm.appendChild(label);
+    });
+
+    saveState();
+  }
+
+  function startTestFlow(name) {
+    testName = (name || "").trim();
+    if (!testName) {
+      alert("Please enter your name first.");
+      nameInput.focus();
+      return;
+    }
+    if (!order.length) buildNewTest();
+
+    hide(startCard);
+    hide(resultsCard);
+    show(testCard);
+    render();
+  }
+
+  function escapeHtml(s) {
+    return String(s)
+      .replaceAll("&", "&amp;")
+      .replaceAll("<", "&lt;")
+      .replaceAll(">", "&gt;")
+      .replaceAll('"', "&quot;")
+      .replaceAll("'", "&#039;");
+  }
+
+  function grade() {
+    let correct = 0;
+    const missed = [];
+
+    for (let pos = 0; pos < order.length; pos++) {
+      const qIndex = order[pos];
+      const chosenDisplayed = answers[qIndex];
+      const correctDisplayed = getCorrectDisplayedIndex(qIndex);
+
+      if (chosenDisplayed === correctDisplayed) {
+        correct++;
+      } else {
+        const q = QUESTIONS[qIndex];
+        const co = ensureChoiceOrder(qIndex);
+
+        const chosenText =
+          (chosenDisplayed === null || chosenDisplayed === undefined)
+            ? "No answer selected"
+            : q.choices[co[chosenDisplayed]];
+
+        const correctText = q.choices[q.a];
+
+        missed.push({
+          number: pos + 1,
+          question: q.q,
+          chosen: chosenText,
+          correct: correctText
+        });
+      }
     }
 
-    // Choices as radio list
-    if (choicesWrap) {
-      choicesWrap.innerHTML = "";
-      const selected = state.answers[i] || "";
+    const total = QUESTIONS.length;
+    const pct = Math.round((correct / total) * 100);
 
-      q.options.forEach((opt, idx) => {
-        const id = `opt_${i}_${idx}`;
-        const row = document.createElement("label");
-        row.className = "choiceRow";
-        row.setAttribute("for", id);
-        row.innerHTML = `
-          <input type="radio" name="q${i}" id="${id}" value="${escapeAttr(opt)}" ${selected === opt ? "checked" : ""}/>
-          <span class="choiceText">${escapeHTML(opt)}</span>
+    rName.textContent = testName;
+    rScore.textContent = `${correct}/${total}`;
+    rPct.textContent = `${pct}%`;
+
+    stamp.classList.remove("hidden", "pass", "fail");
+    const pass = pct >= PASS_PCT;
+    stamp.textContent = pass ? "PASS" : "FAIL";
+    stamp.classList.add(pass ? "pass" : "fail");
+
+    missedList.innerHTML = "";
+    if (missed.length === 0) {
+      const div = document.createElement("div");
+      div.className = "missedItem";
+      div.innerHTML = `<div class="q">Perfect score 🎉</div><div class="a">No missed questions.</div>`;
+      missedList.appendChild(div);
+    } else {
+      missed.forEach(m => {
+        const div = document.createElement("div");
+        div.className = "missedItem";
+        div.innerHTML = `
+          <div class="q">${m.number}. ${escapeHtml(m.question)}</div>
+          <div class="a"><strong>Your answer:</strong> ${escapeHtml(m.chosen)}</div>
+          <div class="a"><strong>Correct:</strong> ${escapeHtml(m.correct)}</div>
         `;
-        row.addEventListener("click", () => {
-          state.answers[i] = opt;
-          saveState();
-          refreshNavButtons();
-        });
-        choicesWrap.appendChild(row);
+        missedList.appendChild(div);
       });
     }
 
-    refreshNavButtons();
-  }
+    hide(testCard);
+    hide(startCard);
+    show(resultsCard);
+    reviewWrap.open = false;
 
-  function refreshNavButtons() {
-    const i = state.idx;
-    const answered = !!state.answers[i];
-
-    if (backBtn) backBtn.disabled = i === 0;
-    if (nextBtn) {
-      // require answer before next
-      nextBtn.disabled = !answered;
-      nextBtn.textContent = i === QUESTIONS.length - 1 ? "Finish" : "Next →";
-    }
-  }
-
-  function scoreTest() {
-    let correct = 0;
-    for (let i = 0; i < QUESTIONS.length; i++) {
-      if (state.answers[i] && state.answers[i] === QUESTIONS[i].answer) correct++;
-    }
-    const pct = Math.round((correct / QUESTIONS.length) * 100);
-    return { correct, pct };
-  }
-
-  function renderResults() {
-    const { correct, pct } = scoreTest();
-    if (rName) rName.textContent = state.name || "—";
-    if (rScore) rScore.textContent = `${correct} / ${QUESTIONS.length}`;
-    if (rPct) rPct.textContent = `${pct}%`;
-
-    const passed = pct >= PASSING_PCT;
-    if (stamp) stamp.textContent = passed ? "PASS ✅" : "FAIL ❌";
-
-    // Never show answers unless you explicitly allow it
-    if (REVIEW_MODE_AFTER_FINISH) {
-      // optional: could render a review section (not included by default)
-    }
-  }
-
-  function startTest() {
-    const nm = (nameInput?.value || "").trim();
-    if (!nm) {
-      alert("Please enter your name.");
-      return;
-    }
-    state.name = nm;
-    state.started = true;
-    state.finished = false;
-    state.idx = 0;
     saveState();
-    show("quiz");
-    renderQuestion();
   }
 
-  function next() {
-    const i = state.idx;
-    if (!state.answers[i]) return;
+  function resetAll() {
+    clearState();
+    order = [];
+    current = 0;
+    answers = [];
+    testName = "";
+    for (let i = 0; i < QUESTIONS.length; i++) answersMeta[i] = null;
 
-    if (i === QUESTIONS.length - 1) {
-      // finish
-      state.finished = true;
-      saveState();
-      show("results");
-      renderResults();
-      return;
+    nameInput.value = "";
+    whoName.textContent = "—";
+
+    hide(testCard);
+    hide(resultsCard);
+    show(startCard);
+  }
+
+  // ===== EVENTS =====
+  startBtn.addEventListener("click", () => startTestFlow(nameInput.value));
+  resetBtnTop.addEventListener("click", resetAll);
+
+  backBtn.addEventListener("click", () => {
+    current = Math.max(0, current - 1);
+    saveState();
+    render();
+  });
+
+  nextBtn.addEventListener("click", () => {
+    current = Math.min(QUESTIONS.length - 1, current + 1);
+    saveState();
+    render();
+  });
+
+  finishBtn.addEventListener("click", grade);
+
+  resetBtn.addEventListener("click", resetAll);
+  restartBtn.addEventListener("click", resetAll);
+
+  reviewBtn.addEventListener("click", () => {
+    reviewWrap.open = true;
+    reviewWrap.scrollIntoView({ behavior: "smooth", block: "start" });
+  });
+
+  nameInput.addEventListener("keydown", (e) => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      startTestFlow(nameInput.value);
     }
-    state.idx++;
-    saveState();
-    renderQuestion();
-  }
+  });
 
-  function back() {
-    if (state.idx === 0) return;
-    state.idx--;
-    saveState();
-    renderQuestion();
-  }
-
-  function restart() {
-    if (!confirm("Restart the test? This will clear answers.")) return;
-    state = { name: "", idx: 0, answers: {}, started: false, finished: false };
-    localStorage.removeItem(KEY);
-    if (nameInput) nameInput.value = "";
-    show("quiz");
-    if (qSection) qSection.style.display = "none";
-    if (resultsSection) resultsSection.style.display = "none";
-  }
-
-  // ============ ESCAPE HELPERS ============
-  function escapeHTML(s) {
-    return String(s).replace(/[&<>"']/g, (m) => ({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;" }[m]));
-  }
-  function escapeAttr(s) {
-    return String(s).replace(/"/g, "&quot;");
-  }
-
-  // ============ WIRE UP ============
-  if (startBtn) startBtn.addEventListener("click", startTest);
-  if (nextBtn) nextBtn.addEventListener("click", next);
-  if (backBtn) backBtn.addEventListener("click", back);
-  if (restartBtn) restartBtn.addEventListener("click", restart);
-
-  // ============ BOOT ============
-  // If they were mid-test, resume
-  if (state.started && !state.finished) {
-    show("quiz");
-    renderQuestion();
-  } else if (state.finished) {
-    show("results");
-    renderResults();
-  } else {
-    // initial
-    if (qSection) qSection.style.display = "none";
-    if (resultsSection) resultsSection.style.display = "none";
+  // ===== BOOT =====
+  const loaded = loadState();
+  if (loaded && testName) {
+    hide(startCard);
+    show(testCard);
+    render();
   }
 })();
