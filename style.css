@@ -5,7 +5,6 @@
   --card2:#0b1e3ed6;
   --text:#eaf2ff;
   --muted:#b9c7e6;
-  --line:#244b86;
   --btn:#183a6b;
   --btn2:#1c4f95;
   --danger:#8b1d2c;
@@ -58,10 +57,7 @@ body{
   box-shadow: var(--shadow);
   font-size: 26px;
 }
-.heroText h1{
-  margin:0;
-  letter-spacing:.2px;
-}
+.heroText h1{margin:0;letter-spacing:.2px}
 .sub{margin:.2rem 0 0;color:var(--muted)}
 
 .card{
@@ -75,7 +71,6 @@ body{
 }
 
 .hidden{display:none !important}
-
 h2{margin: 0 0 10px}
 .muted{color:var(--muted)}
 .small{font-size:.95rem}
@@ -83,7 +78,7 @@ h2{margin: 0 0 10px}
 .center{text-align:center}
 
 .row{margin: 10px 0 14px}
-.label{display:block; font-weight:700; margin: 0 0 8px}
+.label{display:block;font-weight:700;margin: 0 0 8px}
 .input{
   width:100%;
   padding: 12px 14px;
@@ -98,7 +93,7 @@ h2{margin: 0 0 10px}
   box-shadow: 0 0 0 3px rgba(96,165,250,.22);
 }
 
-.btnRow, .navRow{
+.btnRow,.navRow{
   display:flex;
   gap: 10px;
   flex-wrap:wrap;
@@ -121,7 +116,6 @@ h2{margin: 0 0 10px}
   background: linear-gradient(180deg, var(--btn2), var(--btn));
   border-color: rgba(120,190,255,.30);
 }
-.btn.primary:hover{filter: brightness(1.05)}
 .btn.danger{
   background: linear-gradient(180deg, #b72b3f, var(--danger));
   border-color: rgba(255,120,140,.35);
@@ -161,17 +155,9 @@ h2{margin: 0 0 10px}
   background: rgba(0,0,0,.16);
   border: 1px solid rgba(255,255,255,.10);
 }
-.questionText{
-  font-size: 1.05rem;
-  line-height: 1.35;
-}
+.questionText{font-size: 1.05rem;line-height: 1.35}
 
-.options{
-  display:grid;
-  gap: 10px;
-  margin-top: 10px;
-}
-
+.options{display:grid;gap: 10px;margin-top: 10px}
 .opt{
   display:flex;
   align-items:center;
@@ -184,10 +170,7 @@ h2{margin: 0 0 10px}
 }
 .opt:hover{background: rgba(255,255,255,.08)}
 .opt input{transform: scale(1.1)}
-.optText{
-  font-size: .94rem; /* smaller answers */
-  color: var(--text);
-}
+.optText{font-size: .94rem;color: var(--text)}
 
 .resultsTop{
   display:flex;
@@ -212,8 +195,8 @@ h2{margin: 0 0 10px}
   background: rgba(0,0,0,.16);
   border: 1px solid rgba(255,255,255,.10);
 }
-.tileLabel{color:var(--muted); font-size:.86rem}
-.tileValue{font-size:1.05rem; font-weight:800; margin-top:4px}
+.tileLabel{color:var(--muted);font-size:.86rem}
+.tileValue{font-size:1.05rem;font-weight:800;margin-top:4px}
 
 .stamp{
   padding: 10px 14px;
@@ -256,11 +239,7 @@ h2{margin: 0 0 10px}
   background: rgba(0,0,0,.16);
   border: 1px solid rgba(255,255,255,.10);
 }
-.missedItem .q{font-weight:800; margin-bottom:6px}
-.missedItem .a{color:var(--muted); font-size:.92rem}
+.missedItem .q{font-weight:800;margin-bottom:6px}
+.missedItem .a{color:var(--muted);font-size:.92rem}
 
-.foot{
-  margin-top: 16px;
-  text-align:center;
-  opacity:.9;
-}
+.foot{margin-top: 16px;text-align:center;opacity:.9}
