@@ -1,258 +1,292 @@
-const PASS_COUNT = 40; // 80% of 50
+// Wine Knowledge Test (50 Questions) — Easy/Moderate — 80% passing
+(() => {
+  "use strict";
 
-const QUESTIONS = [
-  { q:"Which wine is typically the sweetest?", options:["Cabernet Sauvignon","Pinot Noir","Moscato","Merlot"], answerIndex:2 },
-  { q:"Prosecco comes from which country?", options:["France","Spain","Italy","USA"], answerIndex:2 },
-  { q:"Pinot Grigio is usually best described as:", options:["Bold and tannic","Sweet and heavy","Light, crisp, and refreshing","Smoky and oaky"], answerIndex:2 },
-  { q:"Which wine is sparkling?", options:["Chardonnay","Prosecco","Merlot","Sauvignon Blanc"], answerIndex:1 },
-  { q:"Red wine gets most of its color from:", options:["Oak barrels","Grape skins","Sugar","Bottle aging"], answerIndex:1 },
-  { q:"Which is typically a full-bodied red?", options:["Cabernet Sauvignon","Pinot Grigio","Prosecco","Moscato"], answerIndex:0 },
-  { q:"Which is usually a light-bodied red?", options:["Cabernet Sauvignon","Pinot Noir","Red Blend","Merlot"], answerIndex:1 },
-  { q:"Riesling is typically a:", options:["White wine","Red wine","Sparkling red","Fortified wine only"], answerIndex:0 },
-  { q:"Rosé is usually made by:", options:["Mixing red and white wine (usually)","Short contact with red grape skins","Using only white grapes","Adding food coloring"], answerIndex:1 },
-  { q:"Which pairing is most common?", options:["Cabernet + steak","Moscato + steak","Prosecco + steak","Pinot Grigio + steak"], answerIndex:0 },
+  // ========= QUESTIONS =========
+  // Note: These are designed to be easy-to-moderate and align to common wine knowledge
+  // (grape, country/region, style, basic tasting notes, pairing).
+  // You can swap/adjust any question text later without breaking functionality.
+  const QUESTIONS = [
+    { q: "Cabernet Sauvignon is most commonly known as a:", choices: ["Light-bodied white wine", "Full-bodied red wine", "Sparkling wine", "Sweet dessert wine"], a: 1 },
+    { q: "Pinot Grigio is typically:", choices: ["A white wine", "A red wine", "A fortified wine", "A sparkling-only wine"], a: 0 },
+    { q: "Prosecco is usually produced in:", choices: ["France", "Italy", "Spain", "United States"], a: 1 },
+    { q: "Champagne must come from which country?", choices: ["Italy", "Spain", "France", "Germany"], a: 2 },
+    { q: "Sauvignon Blanc is often described as:", choices: ["Crisp and zesty", "Heavy and tannic", "Sweet and syrupy", "Smoky and oaky by default"], a: 0 },
 
-  { q:"Caymus is best known as which style?", options:["Pinot Noir","Chardonnay","Cabernet Sauvignon","Merlot"], answerIndex:2 },
-  { q:"Veuve Clicquot Yellow Label is a:", options:["Prosecco","Rosé","Champagne","Moscato"], answerIndex:2 },
-  { q:"Kim Crawford is famous for:", options:["Sauvignon Blanc","Merlot","Cabernet Sauvignon","Pinot Noir"], answerIndex:0 },
-  { q:"Seven Daughters Moscato is best described as:", options:["Dry and oaky","Sweet and light","Bold and tannic","Smoky and earthy"], answerIndex:1 },
-  { q:"Santa Margherita is a well-known:", options:["Pinot Grigio","Cabernet Sauvignon","Merlot","Champagne"], answerIndex:0 },
-  { q:"Chateau Ste. Michelle Riesling is a:", options:["White wine","Sparkling wine","Red blend","Rosé only"], answerIndex:0 },
-  { q:"Mark West is commonly a:", options:["Pinot Noir","Cabernet Sauvignon","Merlot","Sauvignon Blanc"], answerIndex:0 },
-  { q:"Meiomi is commonly a:", options:["Pinot Noir","Pinot Grigio","Prosecco","Riesling"], answerIndex:0 },
-  { q:"The Prisoner is typically a:", options:["Red Blend","Chardonnay","Riesling","Sparkling Rosé"], answerIndex:0 },
-  { q:"Apothic is typically a:", options:["Red Blend","Pinot Grigio","Champagne","Sauvignon Blanc"], answerIndex:0 },
+    { q: "Merlot is generally considered:", choices: ["A red grape/wine", "A white grape/wine", "A sparkling-only grape", "A non-grape fruit wine"], a: 0 },
+    { q: "Pinot Noir is often:", choices: ["Very dark and extremely tannic", "Light to medium-bodied red", "A white wine", "Always sweet"], a: 1 },
+    { q: "Chardonnay is most commonly:", choices: ["A white wine", "A red wine", "A rosé only", "A dessert wine only"], a: 0 },
+    { q: "Riesling is often associated with:", choices: ["Germany", "Argentina", "South Africa", "Chile"], a: 0 },
+    { q: "Rosé is typically made from:", choices: ["Only white grapes", "Only red grapes with short skin contact", "Only apples", "Only fortified spirits"], a: 1 },
 
-  { q:"Which is most likely a 'sparkling' option on your list?", options:["Riondo Prosecco","Kendall-Jackson Chardonnay","Josh Cellars Cabernet","Bogle Merlot"], answerIndex:0 },
-  { q:"Which wine would you suggest for someone who wants 'bubbly and celebratory'?", options:["Merlot","Cabernet Sauvignon","Prosecco","Red Blend"], answerIndex:2 },
-  { q:"Which is commonly a crisp, zesty white?", options:["Sauvignon Blanc","Cabernet Sauvignon","Merlot","Red Blend"], answerIndex:0 },
-  { q:"Which is a common Italian red style on your list?", options:["Valpolicella","Moscato","Sauvignon Blanc","Prosecco"], answerIndex:0 },
-  { q:"Ruffino Chianti is from:", options:["France","Italy","USA","New Zealand"], answerIndex:1 },
-  { q:"Chianti is typically:", options:["Italian red wine","French sparkling wine","California white wine","Dessert wine only"], answerIndex:0 },
-  { q:"Chardonnay is typically:", options:["A white wine","A red wine","A sparkling red","A fortified wine"], answerIndex:0 },
-  { q:"Kendall-Jackson is commonly a:", options:["Chardonnay","Prosecco","Moscato","Riesling"], answerIndex:0 },
-  { q:"William Hill (on your list) is commonly a:", options:["Chardonnay","Cabernet Franc","Prosecco Rosé","Port"], answerIndex:0 },
-  { q:"Bogle (on your list) appears under:", options:["Rich & Velvety Reds","Sparkling","Whites only","Rosé only"], answerIndex:0 },
+    { q: "Which is a common Italian red region/wine style?", choices: ["Valpolicella", "Napa Valley", "Marlborough", "Mosel"], a: 0 },
+    { q: "Chianti is a famous wine from:", choices: ["Tuscany, Italy", "Burgundy, France", "Rioja, Spain", "Sonoma, USA"], a: 0 },
+    { q: "Moscato is typically:", choices: ["Very dry and tannic", "Sweet or off-dry and aromatic", "Always sparkling only", "A red blend"], a: 1 },
+    { q: "Which grape is commonly associated with Rioja?", choices: ["Tempranillo", "Sangiovese", "Pinot Noir", "Sauvignon Blanc"], a: 0 },
+    { q: "A 'red blend' means:", choices: ["Blended with soda", "Mixed red and white in the glass", "Made from multiple red grape varieties", "Aged only 1 day"], a: 2 },
 
-  { q:"Best match for a guest asking for 'light and refreshing'?", options:["Pinot Grigio","Cabernet Sauvignon","Red Blend","Merlot"], answerIndex:0 },
-  { q:"A guest wants 'sweet'. Best direction:", options:["Moscato","Cabernet Sauvignon","Valpolicella","Chianti"], answerIndex:0 },
-  { q:"A guest wants 'dry white'. Best direction:", options:["Pinot Grigio or Sauvignon Blanc","Moscato","Red Blend","Merlot"], answerIndex:0 },
-  { q:"A guest wants a smooth red that isn’t too heavy:", options:["Pinot Noir","Cabernet Sauvignon","Big red blend only","Very oaky Chardonnay"], answerIndex:0 },
-  { q:"Cabernet Sauvignon is usually described as:", options:["Bold with tannins","Sweet and bubbly","Light and floral","Only rosé"], answerIndex:0 },
-  { q:"Merlot is often described as:", options:["Softer and smooth red","Sweet sparkling wine","Crisp white only","Always high acid and tart"], answerIndex:0 },
-  { q:"Pinot Noir is usually:", options:["Lighter red with softer tannins","The sweetest wine","Always sparkling","Always fortified"], answerIndex:0 },
-  { q:"Sauvignon Blanc is often:", options:["Crisp with citrus/green notes","Heavy and buttery","Sweet red","Sparkling"], answerIndex:0 },
-  { q:"Which would most likely pair well with pasta + red sauce?", options:["Chianti / Red Blend","Moscato","Prosecco only","Pinot Grigio only"], answerIndex:0 },
-  { q:"Which is a common pairing for spicy food?", options:["Off-dry Riesling or fruity white","Big tannic Cabernet","Very dry red","Only champagne"], answerIndex:0 },
+    { q: "What do tannins usually feel like?", choices: ["Bubbly sensation", "Drying/grippy mouthfeel", "Salty taste", "Spicy heat"], a: 1 },
+    { q: "Which wine is commonly described as 'buttery' when oaked?", choices: ["Chardonnay", "Pinot Grigio", "Riesling", "Prosecco"], a: 0 },
+    { q: "A wine labeled 'Brut' is usually:", choices: ["Sweet", "Dry", "Red", "Fortified"], a: 1 },
+    { q: "Sparkling wine bubbles are from:", choices: ["Tannins", "Carbon dioxide", "Sugar crystals", "Oak barrels"], a: 1 },
+    { q: "Which is a common food pairing for Cabernet Sauvignon?", choices: ["Steak", "Lemon sorbet", "Very spicy curry only", "Cotton candy"], a: 0 },
 
-  { q:"Allegrini Valpolicella is from:", options:["Italy","France","USA","New Zealand"], answerIndex:0 },
-  { q:"La Marca is commonly:", options:["Prosecco","Merlot","Cabernet Sauvignon","Pinot Noir"], answerIndex:0 },
-  { q:"Veuve Clicquot is most associated with:", options:["Champagne, France","Prosecco, Italy","Cabernet, USA","Riesling, Germany"], answerIndex:0 },
-  { q:"Stag’s Leap Artemis is typically a:", options:["Cabernet Sauvignon","Pinot Grigio","Prosecco","Riesling"], answerIndex:0 },
-  { q:"J. Lohr Seven Oaks is typically a:", options:["Cabernet Sauvignon","Moscato","Sparkling Rosé","Pinot Grigio"], answerIndex:0 },
-  { q:"Josh Cellars (on your list) is commonly:", options:["Cabernet Sauvignon","Prosecco","Champagne","Riesling"], answerIndex:0 },
-  { q:"Beringer Founders’ Estate (on your list) is commonly:", options:["Cabernet Sauvignon","Pinot Grigio","Moscato","Prosecco"], answerIndex:0 },
-  { q:"Duckhorn 'Decoy' on your list is shown under:", options:["Reds","Sparkling","Rosé only","Whites only"], answerIndex:0 },
-  { q:"The term 'Red Blend' means:", options:["Multiple red grapes combined","White wine mixed with red","Only one grape","Wine mixed with soda"], answerIndex:0 },
-  { q:"If a guest says 'I don’t like bitterness/tannins,' steer away from:", options:["Big Cabernet Sauvignon","Pinot Grigio","Prosecco","Moscato"], answerIndex:0 }
-];
+    { q: "Sauvignon Blanc pairs well with:", choices: ["Seafood or salads", "Only chocolate cake", "Only burgers", "Only ice cream"], a: 0 },
+    { q: "Pinot Noir often pairs well with:", choices: ["Heavier than steak-only", "Chicken, salmon, or lighter meats", "Only spicy wings", "Only dessert"], a: 1 },
+    { q: "Merlot is often considered:", choices: ["Soft and approachable", "Extremely acidic and fizzy", "Always sweet sparkling", "A fortified spirit"], a: 0 },
+    { q: "Which is a common California wine region?", choices: ["Napa Valley", "Tuscany", "Champagne", "Mosel"], a: 0 },
+    { q: "Which is commonly a sparkling wine from Italy?", choices: ["Prosecco", "Rioja", "Chianti", "Cabernet Sauvignon"], a: 0 },
 
-// ---------- UI ----------
-const el = (id) => document.getElementById(id);
+    { q: "Which is typically a 'white zinfandel'?", choices: ["A sweet-ish rosé style", "A heavy red-only wine", "A fortified wine", "A brandy"], a: 0 },
+    { q: "Pinot Grigio is often described as:", choices: ["Light and crisp", "Heavy and tannic", "Always sweet", "Always oaky"], a: 0 },
+    { q: "Riesling can range from:", choices: ["Only sweet", "Only dry", "Dry to sweet", "Only red"], a: 2 },
+    { q: "A wine’s 'body' refers to:", choices: ["Bottle shape", "Weight/feel in the mouth", "Sugar only", "Color only"], a: 1 },
+    { q: "Which wine is commonly served chilled?", choices: ["White wine", "Red wine only", "Only fortified wine", "Only dessert wine"], a: 0 },
 
-const startScreen = el("startScreen");
-const testScreen = el("testScreen");
-const resultsScreen = el("resultsScreen");
+    { q: "Caymus is most commonly known as a:", choices: ["Cabernet Sauvignon", "Pinot Grigio", "Prosecco", "Riesling"], a: 0 },
+    { q: "Sangiovese is strongly associated with:", choices: ["Italy (Tuscany/Chianti)", "New Zealand", "Germany", "South Africa"], a: 0 },
+    { q: "Tempranillo is strongly associated with:", choices: ["Spain", "France", "Italy", "Australia"], a: 0 },
+    { q: "Pinot Noir is strongly associated with Burgundy in:", choices: ["France", "Spain", "Greece", "Portugal"], a: 0 },
+    { q: "Sauvignon Blanc is strongly associated with Marlborough in:", choices: ["New Zealand", "Italy", "USA only", "Germany"], a: 0 },
 
-const statusBadge = el("statusBadge");
-const startBtn = el("startBtn");
-const submitBtn = el("submitBtn");
-const restartBtn = el("restartBtn");
-const printBtn = el("printBtn");
-const reviewBtn = el("reviewBtn");
-const scrollTopBtn = el("scrollTopBtn");
+    { q: "A wine described as 'oaked' often has notes like:", choices: ["Vanilla/toast", "Lemon zest only", "Sea salt only", "Mint gum only"], a: 0 },
+    { q: "A wine described as 'unoaked' is often:", choices: ["More fruit-forward and crisp", "Always sweet", "Always sparkling", "Always red blend"], a: 0 },
+    { q: "Which one is usually a red wine?", choices: ["Cabernet Sauvignon", "Pinot Grigio", "Prosecco", "Moscato"], a: 0 },
+    { q: "Which one is usually a white wine?", choices: ["Sauvignon Blanc", "Merlot", "Pinot Noir", "Red blend"], a: 0 },
+    { q: "Which is often considered a lighter red wine?", choices: ["Pinot Noir", "Cabernet Sauvignon", "Syrah (usually)", "Very oaky Malbec (usually)"], a: 0 },
 
-const testName = el("testName");
-const questionList = el("questionList");
-const progressText = el("progressText");
-const progressFill = el("progressFill");
+    { q: "Which wine style is typically sweet and bubbly?", choices: ["Moscato (sparkling)", "Cabernet Sauvignon", "Chianti", "Tempranillo reserva"], a: 0 },
+    { q: "Which wine is commonly described as 'zesty'?", choices: ["Sauvignon Blanc", "Merlot", "Cabernet Sauvignon", "Red blend"], a: 0 },
+    { q: "A 'split' bottle is commonly:", choices: ["Smaller than a standard bottle", "Bigger than a magnum", "Not a bottle size", "Only for red wine"], a: 0 },
+    { q: "Which pair is both typically Italian wines?", choices: ["Chianti & Prosecco", "Champagne & Rioja", "Napa & Mosel", "Burgundy & Marlborough"], a: 0 },
+    { q: "Which is typically a rosé wine brand/style you might see?", choices: ["Rosé Provence style", "Valpolicella Amarone only", "Cabernet Reserve only", "Brut Champagne only"], a: 0 },
 
-const testTitle = el("testTitle");
-const testMeta = el("testMeta");
+    { q: "White wines are generally higher in:", choices: ["Acidity (often)", "Tannins (always)", "Smoke flavor by default", "Carbonation always"], a: 0 },
+    { q: "Red wines generally get tannins from:", choices: ["Grape skins", "Ice", "Sugar", "Water"], a: 0 },
+    { q: "Sparkling wines are commonly served in:", choices: ["Flute or tulip glass", "Coffee mug", "Shot glass", "Soup bowl"], a: 0 },
+    { q: "A dry wine means it has:", choices: ["Less residual sugar", "More bubbles", "More salt", "More alcohol always"], a: 0 },
+    { q: "If a guest wants something 'smooth and easy' in reds, a common pick is:", choices: ["Merlot", "Very tannic young Cab", "Extra-brut Champagne", "High acid Riesling"], a: 0 },
+  ];
 
-const resName = el("resName");
-const resScore = el("resScore");
-const resPassFail = el("resPassFail");
-const resDate = el("resDate");
-const reviewPanel = el("reviewPanel");
+  const PASS_PERCENT = 80;
 
-el("qCount").textContent = String(QUESTIONS.length);
+  // ========= DOM =========
+  const el = (id) => document.getElementById(id);
 
-let userAnswers = new Array(QUESTIONS.length).fill(null);
-let userName = "";
+  const introScreen = el("introScreen");
+  const quizScreen = el("quizScreen");
+  const resultsScreen = el("resultsScreen");
 
-function setBadge(text){ statusBadge.textContent = text; }
-function show(section){
-  startScreen.classList.add("hidden");
-  testScreen.classList.add("hidden");
-  resultsScreen.classList.add("hidden");
-  section.classList.remove("hidden");
-}
-function escapeHtml(str){
-  return String(str)
-    .replaceAll("&","&amp;")
-    .replaceAll("<","&lt;")
-    .replaceAll(">","&gt;")
-    .replaceAll('"',"&quot;")
-    .replaceAll("'","&#039;");
-}
+  const testerName = el("testerName");
+  const startTestBtn = el("startTestBtn");
+  const introError = el("introError");
 
-function renderQuestions(){
-  questionList.innerHTML = "";
-  QUESTIONS.forEach((item, idx) => {
-    const card = document.createElement("div");
-    card.className = "qCard";
+  const namePill = el("namePill");
+  const quizTitle = el("quizTitle");
+  const progressText = el("progressText");
+  const questionText = el("questionText");
+  const answersBox = el("answersBox");
+  const quizError = el("quizError");
+  const prevBtn = el("prevBtn");
+  const nextBtn = el("nextBtn");
 
-    const top = document.createElement("div");
-    top.className = "qTop";
-    top.innerHTML = `
-      <div>
-        <div class="qNum">Question ${idx+1} of ${QUESTIONS.length}</div>
-        <div class="qText">${escapeHtml(item.q)}</div>
-      </div>
-    `;
+  const resultName = el("resultName");
+  const resultScore = el("resultScore");
+  const resultPercent = el("resultPercent");
+  const passStamp = el("passStamp");
+  const reviewBtn = el("reviewBtn");
+  const restartBtn = el("restartBtn");
+  const reviewWrap = el("reviewWrap");
+  const hideReviewBtn = el("hideReviewBtn");
+  const reviewList = el("reviewList");
 
-    const opts = document.createElement("div");
-    opts.className = "options";
+  // ========= STATE =========
+  let currentIndex = 0;
+  let name = "";
+  let answers = new Array(QUESTIONS.length).fill(null);
 
-    item.options.forEach((optText, oIdx) => {
-      const opt = document.createElement("label");
-      opt.className = "opt";
-      opt.innerHTML = `
-        <input type="radio" name="q${idx}" value="${oIdx}" />
-        <div><strong>${String.fromCharCode(65+oIdx)}.</strong> ${escapeHtml(optText)}</div>
-      `;
-      opt.querySelector("input").addEventListener("change", () => {
-        userAnswers[idx] = oIdx;
-        updateProgress();
+  // ========= HELPERS =========
+  function showOnly(screen) {
+    [introScreen, quizScreen, resultsScreen].forEach(s => s.classList.add("hidden"));
+    screen.classList.remove("hidden");
+    window.scrollTo({ top: 0, behavior: "instant" });
+  }
+
+  function sanitizeName(str) {
+    return (str || "").trim().replace(/\s+/g, " ");
+  }
+
+  function renderQuestion(i) {
+    quizError.textContent = "";
+
+    const total = QUESTIONS.length;
+    const qObj = QUESTIONS[i];
+
+    quizTitle.textContent = `Question ${i + 1}`;
+    progressText.textContent = `${i + 1} of ${total}`;
+    questionText.textContent = qObj.q;
+
+    answersBox.innerHTML = "";
+
+    qObj.choices.forEach((choiceText, idx) => {
+      const choice = document.createElement("label");
+      choice.className = "choice";
+
+      const input = document.createElement("input");
+      input.type = "radio";
+      input.name = "answer";
+      input.value = String(idx);
+      input.checked = answers[i] === idx;
+
+      const span = document.createElement("div");
+      span.className = "choiceText";
+      span.textContent = choiceText;
+
+      choice.appendChild(input);
+      choice.appendChild(span);
+
+      choice.addEventListener("click", () => {
+        answers[i] = idx;
+        // Update checked states
+        [...answersBox.querySelectorAll("input")].forEach(r => (r.checked = false));
+        input.checked = true;
       });
-      opts.appendChild(opt);
+
+      answersBox.appendChild(choice);
     });
 
-    card.appendChild(top);
-    card.appendChild(opts);
-    questionList.appendChild(card);
+    prevBtn.disabled = i === 0;
+    nextBtn.textContent = (i === total - 1) ? "Finish ✅" : "Next →";
+  }
+
+  function computeScore() {
+    let correct = 0;
+    for (let i = 0; i < QUESTIONS.length; i++) {
+      if (answers[i] === QUESTIONS[i].a) correct++;
+    }
+    const percent = Math.round((correct / QUESTIONS.length) * 100);
+    return { correct, percent };
+  }
+
+  function showResults() {
+    const { correct, percent } = computeScore();
+    const total = QUESTIONS.length;
+
+    resultName.textContent = name;
+    resultScore.textContent = `${correct} / ${total}`;
+    resultPercent.textContent = `${percent}%`;
+
+    const passed = percent >= PASS_PERCENT;
+    passStamp.textContent = passed ? "PASS" : "FAIL";
+    passStamp.classList.toggle("fail", !passed);
+
+    showOnly(resultsScreen);
+  }
+
+  function buildReview() {
+    reviewList.innerHTML = "";
+
+    for (let i = 0; i < QUESTIONS.length; i++) {
+      const qObj = QUESTIONS[i];
+      const user = answers[i];
+      const correctIndex = qObj.a;
+
+      const item = document.createElement("div");
+      item.className = "reviewItem";
+
+      const title = document.createElement("div");
+      title.innerHTML = `<b>Q${i + 1}.</b> ${qObj.q}`;
+
+      const userLine = document.createElement("div");
+      userLine.className = "reviewMeta";
+      userLine.textContent = `Your answer: ${user === null ? "— (no answer)" : qObj.choices[user]}`;
+
+      const correctLine = document.createElement("div");
+      correctLine.className = "reviewMeta";
+      correctLine.textContent = `Correct answer: ${qObj.choices[correctIndex]}`;
+
+      const status = document.createElement("div");
+      status.className = "reviewMeta";
+      const ok = user === correctIndex;
+      status.textContent = ok ? "✅ Correct" : "❌ Incorrect";
+
+      item.appendChild(title);
+      item.appendChild(userLine);
+      item.appendChild(correctLine);
+      item.appendChild(status);
+
+      reviewList.appendChild(item);
+    }
+  }
+
+  function requireAnswerBeforeNext() {
+    if (answers[currentIndex] === null) {
+      quizError.textContent = "Please select an answer to continue.";
+      return false;
+    }
+    return true;
+  }
+
+  // ========= EVENTS =========
+  startTestBtn.addEventListener("click", () => {
+    introError.textContent = "";
+    name = sanitizeName(testerName.value);
+
+    if (!name) {
+      introError.textContent = "Please enter your name to begin.";
+      testerName.focus();
+      return;
+    }
+
+    // Reset state
+    currentIndex = 0;
+    answers = new Array(QUESTIONS.length).fill(null);
+
+    namePill.textContent = name;
+
+    showOnly(quizScreen);
+    renderQuestion(currentIndex);
   });
 
-  updateProgress();
-}
-
-function updateProgress(){
-  const answered = userAnswers.filter(v => v !== null).length;
-  progressText.textContent = `${answered}/${QUESTIONS.length} answered`;
-  const pct = Math.round((answered / QUESTIONS.length) * 100);
-  progressFill.style.width = `${pct}%`;
-}
-
-function grade(){
-  let correct = 0;
-  const details = [];
-
-  for(let i=0;i<QUESTIONS.length;i++){
-    const q = QUESTIONS[i];
-    const ua = userAnswers[i];
-    const isCorrect = ua === q.answerIndex;
-    if(isCorrect) correct++;
-    details.push({ i, q: q.q, chosen: ua, correct: q.answerIndex, isCorrect });
-  }
-
-  const percent = Math.round((correct / QUESTIONS.length) * 100);
-  const pass = correct >= PASS_COUNT;
-  return { correct, percent, pass, details };
-}
-
-function showResults(result){
-  resName.textContent = userName || "—";
-  resScore.textContent = `${result.correct}/${QUESTIONS.length} (${result.percent}%)`;
-  resPassFail.textContent = result.pass ? "PASS ✅" : "FAIL ❌";
-  resPassFail.className = "resultsValue " + (result.pass ? "pass" : "fail");
-  resDate.textContent = new Date().toLocaleString();
-
-  reviewPanel.innerHTML = "";
-  result.details.forEach(d => {
-    const q = QUESTIONS[d.i];
-    const chosenText = (d.chosen === null)
-      ? "No answer"
-      : `${String.fromCharCode(65 + d.chosen)}. ${q.options[d.chosen]}`;
-    const correctText = `${String.fromCharCode(65 + d.correct)}. ${q.options[d.correct]}`;
-
-    const item = document.createElement("div");
-    item.className = "reviewItem";
-    item.innerHTML = `
-      <div class="reviewQ">${d.i+1}. ${escapeHtml(d.q)}</div>
-      <div class="reviewA">Your answer:
-        <span class="${d.isCorrect ? "reviewGood" : "reviewBad"}">${escapeHtml(chosenText)}</span>
-      </div>
-      ${d.isCorrect ? "" : `<div class="reviewA">Correct:
-        <span class="reviewGood">${escapeHtml(correctText)}</span>
-      </div>`}
-    `;
-    reviewPanel.appendChild(item);
+  prevBtn.addEventListener("click", () => {
+    quizError.textContent = "";
+    if (currentIndex > 0) {
+      currentIndex--;
+      renderQuestion(currentIndex);
+    }
   });
-}
 
-// Events
-startBtn.addEventListener("click", () => {
-  userName = (testName.value || "").trim();
-  if(!userName){
-    alert("Please enter your name.");
-    testName.focus();
-    return;
-  }
-  userAnswers = new Array(QUESTIONS.length).fill(null);
-  renderQuestions();
+  nextBtn.addEventListener("click", () => {
+    quizError.textContent = "";
 
-  testTitle.textContent = "Wine Knowledge Test";
-  testMeta.textContent = `Name: ${userName} • ${QUESTIONS.length} questions • Pass = 80%`;
+    // Require answer before proceeding/finishing
+    if (!requireAnswerBeforeNext()) return;
 
-  setBadge("In Progress");
-  show(testScreen);
-  window.scrollTo({ top: 0, behavior: "smooth" });
-});
+    if (currentIndex < QUESTIONS.length - 1) {
+      currentIndex++;
+      renderQuestion(currentIndex);
+    } else {
+      showResults();
+    }
+  });
 
-submitBtn.addEventListener("click", () => {
-  const unanswered = userAnswers.filter(v => v === null).length;
-  if(unanswered){
-    const ok = confirm(`You left ${unanswered} unanswered.\n\nSubmit anyway?`);
-    if(!ok) return;
-  }
+  reviewBtn.addEventListener("click", () => {
+    buildReview();
+    reviewWrap.classList.remove("hidden");
+    window.scrollTo({ top: document.body.scrollHeight, behavior: "smooth" });
+  });
 
-  const result = grade();
-  showResults(result);
+  hideReviewBtn.addEventListener("click", () => {
+    reviewWrap.classList.add("hidden");
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  });
 
-  setBadge(result.pass ? "PASS ✅" : "FAIL ❌");
-  show(resultsScreen);
-  reviewPanel.classList.add("hidden");
-  reviewBtn.textContent = "Review Answers";
-  window.scrollTo({ top: 0, behavior: "smooth" });
-});
+  restartBtn.addEventListener("click", () => {
+    testerName.value = "";
+    introError.textContent = "";
+    quizError.textContent = "";
+    reviewWrap.classList.add("hidden");
+    showOnly(introScreen);
+  });
 
-restartBtn.addEventListener("click", () => {
-  testName.value = "";
-  userName = "";
-  userAnswers = new Array(QUESTIONS.length).fill(null);
-  setBadge("Ready");
-  show(startScreen);
-  window.scrollTo({ top: 0, behavior: "smooth" });
-});
-
-printBtn.addEventListener("click", () => window.print());
-reviewBtn.addEventListener("click", () => {
-  reviewPanel.classList.toggle("hidden");
-  reviewBtn.textContent = reviewPanel.classList.contains("hidden") ? "Review Answers" : "Hide Review";
-});
-scrollTopBtn.addEventListener("click", () => window.scrollTo({ top: 0, behavior: "smooth" }));
-
-// Initial
-setBadge("Ready");
-show(startScreen);
+})();
