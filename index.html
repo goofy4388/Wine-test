@@ -4,6 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Wine Knowledge Test</title>
+
   <style>
     :root{
       --bg1:#07152e; --bg2:#0a2b55;
@@ -20,9 +21,10 @@
       margin:0;
       font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
       color:var(--text);
-      background: radial-gradient(1200px 700px at 20% 10%, #1a4da0 0%, transparent 55%),
-                  radial-gradient(900px 600px at 80% 20%, #2a2c7b 0%, transparent 55%),
-                  linear-gradient(180deg, var(--bg2), var(--bg1));
+      background:
+        radial-gradient(1200px 700px at 20% 10%, #1a4da0 0%, transparent 55%),
+        radial-gradient(900px 600px at 80% 20%, #2a2c7b 0%, transparent 55%),
+        linear-gradient(180deg, var(--bg2), var(--bg1));
       overflow-x:hidden;
     }
     .bgGlow{
@@ -34,7 +36,7 @@
       filter: blur(2px);
       pointer-events:none;
     }
-    .wrap{max-width:920px;margin:0 auto;padding:28px 18px 40px;position:relative}
+    .wrap{max-width:980px;margin:0 auto;padding:28px 18px 40px;position:relative}
     .hero{display:flex;gap:14px;align-items:center;margin:10px 0 18px}
     .heroIcon{
       width:54px;height:54px;border-radius:14px;
@@ -46,6 +48,7 @@
     }
     .heroText h1{margin:0;letter-spacing:.2px}
     .sub{margin:.2rem 0 0;color:var(--muted)}
+
     .card{
       background: linear-gradient(180deg, var(--card), var(--card2));
       border: 1px solid rgba(255,255,255,.10);
@@ -63,7 +66,7 @@
     .center{text-align:center}
 
     .row{margin:10px 0 14px}
-    .label{display:block;font-weight:700;margin:0 0 8px}
+    .label{display:block;font-weight:800;margin:0 0 8px}
     .input{
       width:100%;padding:12px 14px;border-radius:14px;
       border:1px solid rgba(255,255,255,.14);
@@ -75,6 +78,7 @@
       border-color: rgba(110,174,255,.8);
       box-shadow: 0 0 0 3px rgba(96,165,250,.22);
     }
+
     .btnRow,.navRow{
       display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-top:12px
     }
@@ -84,8 +88,11 @@
       background: rgba(0,0,0,.16);
       color: var(--text);
       cursor:pointer;
+      transition: transform .05s ease, background .15s ease, opacity .15s ease;
+      user-select:none;
     }
     .btn:hover{background: rgba(255,255,255,.08)}
+    .btn:active{transform: translateY(1px)}
     .btn.primary{
       background: linear-gradient(180deg, var(--btn2), var(--btn));
       border-color: rgba(120,190,255,.30);
@@ -95,13 +102,17 @@
       border-color: rgba(255,120,140,.35);
     }
     .btn.ghost{background:transparent;border-color:rgba(255,255,255,.18)}
+    .btn:disabled{opacity:.45; cursor:not-allowed}
+
     .testTop{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:10px}
     .pill{
       padding:8px 12px;border-radius:999px;
       background: rgba(255,255,255,.06);
       border: 1px solid rgba(255,255,255,.10);
       color: var(--muted);
+      font-weight:700;
     }
+
     .qHeader{display:flex;justify-content:space-between;align-items:baseline;gap:10px;flex-wrap:wrap}
     .questionBox{
       margin: 10px 0 12px;
@@ -110,18 +121,20 @@
       background: rgba(0,0,0,.16);
       border: 1px solid rgba(255,255,255,.10);
     }
-    .questionText{font-size:1.05rem;line-height:1.35}
+    .questionText{font-size:1.06rem;line-height:1.38;font-weight:750}
+
     .options{display:grid;gap:10px;margin-top:10px}
     .opt{
-      display:flex;align-items:center;gap:10px;
+      display:flex;align-items:flex-start;gap:12px;
       padding:12px 12px;border-radius:16px;
       background: rgba(255,255,255,.05);
       border:1px solid rgba(255,255,255,.10);
       cursor:pointer;
     }
     .opt:hover{background: rgba(255,255,255,.08)}
-    .opt input{transform: scale(1.1)}
-    .optText{font-size:.94rem;color:var(--text)}
+    .opt input{transform: scale(1.12); margin-top:3px}
+    .optText{font-size:.95rem;line-height:1.32;color:var(--text)}
+
     .resultsTop{display:flex;justify-content:space-between;align-items:center;gap:10px}
     .resultsGrid{
       display:grid;
@@ -130,18 +143,21 @@
       margin:12px 0 10px;
     }
     @media (max-width:800px){.resultsGrid{grid-template-columns:repeat(2, minmax(0,1fr));}}
+
     .resultTile{
       padding:12px;border-radius:16px;
       background: rgba(0,0,0,.16);
       border: 1px solid rgba(255,255,255,.10);
     }
-    .tileLabel{color:var(--muted);font-size:.86rem}
-    .tileValue{font-size:1.05rem;font-weight:800;margin-top:4px}
+    .tileLabel{color:var(--muted);font-size:.86rem;font-weight:800}
+    .tileValue{font-size:1.06rem;font-weight:900;margin-top:4px}
+
     .stamp{
       padding:10px 14px;border-radius:12px;
       border:2px dashed rgba(255,255,255,.5);
-      font-weight:900;letter-spacing:.8px;
+      font-weight:1000;letter-spacing:.8px;
       transform: rotate(-6deg);
+      box-shadow: 0 12px 28px rgba(0,0,0,.25);
     }
     .stamp.pass{
       color:#b7ffcb;background: rgba(20,120,60,.18);
@@ -151,46 +167,54 @@
       color:#ffb7b7;background: rgba(150,20,40,.18);
       border-color: rgba(255,183,183,.7);
     }
+
     .reviewWrap{margin-top:12px;padding-top:8px;border-top:1px solid rgba(255,255,255,.12)}
-    .reviewWrap summary{cursor:pointer;color:var(--muted);font-weight:700}
+    .reviewWrap summary{cursor:pointer;color:var(--muted);font-weight:900}
     .missedList{margin-top:10px;display:grid;gap:10px}
     .missedItem{
       padding:12px;border-radius:16px;
       background: rgba(0,0,0,.16);
       border: 1px solid rgba(255,255,255,.10);
     }
-    .missedItem .q{font-weight:800;margin-bottom:6px}
-    .missedItem .a{color:var(--muted);font-size:.92rem}
+    .missedItem .q{font-weight:950;margin-bottom:6px}
+    .missedItem .a{color:var(--muted);font-size:.93rem;line-height:1.35}
+
     .foot{margin-top:16px;text-align:center;opacity:.9}
   </style>
 </head>
+
 <body>
   <div class="bgGlow"></div>
 
   <main class="wrap">
     <header class="hero">
-      <div class="heroIcon">🍷</div>
+      <div class="heroIcon" aria-hidden="true">🍷</div>
       <div class="heroText">
         <h1>Wine Knowledge Test</h1>
-        <p class="sub">50 questions • 80% to pass • Screenshot your results</p>
+        <p class="sub">50 questions • No timer • 80% to pass • Screenshot results</p>
       </div>
     </header>
 
+    <!-- START -->
     <section class="card" id="startCard">
       <h2>Start</h2>
       <p class="muted">Enter your name and press <strong>Start Test</strong>.</p>
+
       <div class="row">
         <label class="label" for="nameInput">Your Name</label>
-        <input id="nameInput" class="input" type="text" placeholder="First + Last name" />
+        <input id="nameInput" class="input" type="text" placeholder="First + Last name" autocomplete="name" />
       </div>
+
       <div class="btnRow">
         <button id="startBtn" class="btn primary" type="button">Start Test</button>
         <button id="resetBtnTop" class="btn ghost" type="button">Reset</button>
       </div>
+
       <p class="tiny center muted">Local-only. Nothing is sent anywhere.</p>
     </section>
 
-    <section class="card hidden" id="testCard">
+    <!-- TEST -->
+    <section class="card hidden" id="testCard" aria-live="polite">
       <div class="testTop">
         <div class="pill">Name: <span id="whoName">—</span></div>
         <div class="pill">Progress: <span id="progressText">0/50</span></div>
@@ -205,7 +229,7 @@
         <div id="questionText" class="questionText">Loading…</div>
       </div>
 
-      <form id="optionsForm" class="options"></form>
+      <form id="optionsForm" class="options" autocomplete="off"></form>
 
       <div class="navRow">
         <button id="backBtn" class="btn" type="button">← Back</button>
@@ -216,8 +240,11 @@
       <div class="btnRow">
         <button id="resetBtn" class="btn ghost" type="button">Reset</button>
       </div>
+
+      <p class="tiny center muted">You must answer to continue.</p>
     </section>
 
+    <!-- RESULTS -->
     <section class="card hidden" id="resultsCard">
       <div class="resultsTop">
         <h2>Results</h2>
@@ -240,233 +267,347 @@
         <summary>Show missed questions</summary>
         <div id="missedList" class="missedList"></div>
       </details>
+
+      <p class="tiny center muted">Screenshot this results page and send it in.</p>
     </section>
 
-    <footer class="foot muted tiny">Works on GitHub Pages. No external files.</footer>
+    <footer class="foot muted tiny">Built for training • GitHub Pages safe • Single file</footer>
   </main>
 
   <script>
-    // ====== QUESTIONS (50) ======
-    // If you want harder later, we can swap these to pairing/region questions.
-    const PASS_PCT = 80;
-    const QUESTIONS = [
-      { q:"Which wine is a French Champagne?", c:["Veuve Clicquot Yellow Label","Riondo Prosecco","Kim Crawford Sauvignon Blanc","Bogle Merlot"], a:0 },
-      { q:"Which wine is a Prosecco?", c:["Riondo Prosecco","Caymus Cabernet Sauvignon","Meiomi Pinot Noir","Rombauer Chardonnay"], a:0 },
-      { q:"Which wine is Prosecco Rosé?", c:["La Marca Prosecco Rosé","Chateau Ste. Michelle Riesling","Apothic Red Blend","Allegrini Valpolicella"], a:0 },
-      { q:"Which wine is a New Zealand Sauvignon Blanc?", c:["Kim Crawford Sauvignon Blanc","Santa Margherita Pinot Grigio","Kendall-Jackson Chardonnay","The Prisoner Red Blend"], a:0 },
-      { q:"Which wine is a Washington Riesling?", c:["Chateau Ste. Michelle Riesling","Josh Cellars Cabernet Sauvignon","Ruffino Chianti DOCG","Veuve Clicquot Yellow Label"], a:0 },
+    (function(){
+      "use strict";
 
-      { q:"Which wine is a sweet Moscato?", c:["Seven Daughters Moscato","DAOU Cabernet Sauvignon","Mark West Pinot Noir","Conundrum Red Blend"], a:0 },
-      { q:"Which wine is a French Rosé?", c:["Fleurs de Prairie Rosé","Copper Ridge White Zinfandel","Bonizio Rosso by Cecchi","Coppola Diamond Cabernet Sauvignon"], a:0 },
-      { q:"Which wine is an Italian Pinot Grigio often considered premium?", c:["Santa Margherita Pinot Grigio","Ecco Domani Pinot Grigio","Chloe Pinot Grigio","Kim Crawford Sauvignon Blanc"], a:0 },
-      { q:"Which wine is a California Chardonnay known for a rich style?", c:["Rombauer Chardonnay","William Hill Chardonnay","Antinori 'Tormaresca'","Chateau Ste. Michelle Riesling"], a:0 },
-      { q:"Which wine is a bold, well-known California red blend brand?", c:["The Prisoner Red Blend","Chloe Pinot Grigio","Riondo Prosecco","Chateau Ste. Michelle Riesling"], a:0 },
+      const PASS_PCT = 80;
+      const KEY = "wine_test_final_v1";
 
-      // repeat pattern to reach 50 (kept reliable)
-      { q:"Which wine is a Chianti DOCG?", c:["Ruffino Chianti DOCG","Bogle Merlot","Kendall-Jackson Chardonnay","Riondo Prosecco"], a:0 },
-      { q:"Which wine is a Chianti Classico?", c:["Cecchi Chianti Classico","Conundrum Red Blend","Mark West Pinot Noir","Seven Daughters Moscato"], a:0 },
-      { q:"Which wine is a Valpolicella from Verona?", c:["Allegrini Valpolicella","Josh Cellars Cabernet Sauvignon","DAOU Cabernet Sauvignon","Veuve Clicquot Yellow Label"], a:0 },
-      { q:"Which wine is a Merlot?", c:["Bogle Merlot","Riondo Prosecco","Veuve Clicquot Yellow Label","Kim Crawford Sauvignon Blanc"], a:0 },
-      { q:"Which wine is a Pinot Noir?", c:["Meiomi Pinot Noir","Apothic Red Blend","Conundrum Red Blend","Josh Cellars Cabernet Sauvignon"], a:0 },
+      // =========================
+      //  50 QUESTIONS (EXACT)
+      // =========================
+      // q: string
+      // choices: [A,B,C,D]
+      // a: index 0-3
+      const QUESTIONS = [
+        { q:"Which wine style is typically the most acidic?", choices:["Cabernet Sauvignon","Chardonnay","Sauvignon Blanc","Merlot"], a:2 },
+        { q:"Which wine style is most commonly served chilled?", choices:["Pinot Noir","Rosé","Cabernet Sauvignon","Red Blend"], a:1 },
+        { q:"Which wine would MOST LIKELY pair best with spicy food?", choices:["Cabernet Sauvignon","Moscato","Merlot","Chianti"], a:1 },
+        { q:"Which wine style is typically full-bodied?", choices:["Pinot Grigio","Riesling","Cabernet Sauvignon","Sauvignon Blanc"], a:2 },
+        { q:"Which wine is MOST LIKELY to have noticeable oak influence?", choices:["Sauvignon Blanc","Riesling","Chardonnay","Prosecco"], a:2 },
 
-      { q:"Which wine is a Cabernet Sauvignon from Napa Valley?", c:["Caymus Cabernet Sauvignon","Beringer Founders' Estate Cabernet Sauvignon","Josh Cellars Cabernet Sauvignon","J. Lohr 'Seven Oaks' Cabernet Sauvignon"], a:0 },
-      { q:"Which wine is a Cabernet Sauvignon labeled 'Seven Oaks'?", c:["J. Lohr 'Seven Oaks' Cabernet Sauvignon","Coppola Diamond Cabernet Sauvignon","DAOU Cabernet Sauvignon","Beringer Founders' Estate Cabernet Sauvignon"], a:0 },
-      { q:"Which wine is a Cabernet Sauvignon labeled DAOU?", c:["DAOU Cabernet Sauvignon","Josh Cellars Cabernet Sauvignon","Coppola Diamond Cabernet Sauvignon","Beringer Founders' Estate Cabernet Sauvignon"], a:0 },
-      { q:"Which wine is a value-focused red blend brand?", c:["Apothic Red Blend","Il Borro 'Pian di Nova'","Veuve Clicquot Yellow Label","Santa Margherita Pinot Grigio"], a:0 },
-      { q:"Which wine is labeled 'Abstract' red blend?", c:["Orin Swift 'Abstract' Red Blend","Conundrum Red Blend","Apothic Red Blend","The Prisoner Red Blend"], a:0 },
+        { q:"Which wine style is typically carbonated?", choices:["Prosecco","Pinot Grigio","Rosé","Merlot"], a:0 },
+        { q:"Which wine is generally the sweetest?", choices:["Cabernet Sauvignon","Moscato","Pinot Noir","Chianti"], a:1 },
+        { q:"Which sparkling wine comes specifically from France?", choices:["Prosecco","Champagne","Cava","Sparkling Rosé"], a:1 },
+        { q:"Which wine is MOST LIKELY used for celebrations or toasts?", choices:["Merlot","Prosecco","Chianti","Red Blend"], a:1 },
+        { q:"Which wine style is typically lower in alcohol?", choices:["Cabernet Sauvignon","Moscato","Red Blend","Super Tuscan"], a:1 },
 
-      // Fill to 50 with safe duplicates (still functional, no button breaks)
-      ...Array.from({length:30}, (_,i)=>({
-        q:`Wine knowledge check #${i+21}: Which option is a sparkling wine?`,
-        c:["Veuve Clicquot Yellow Label","Meiomi Pinot Noir","Bogle Merlot","DAOU Cabernet Sauvignon"],
-        a:0
-      }))
-    ];
+        { q:"Which country is MOST associated with Prosecco?", choices:["France","Spain","Italy","USA"], a:2 },
+        { q:"Which country is MOST associated with Sauvignon Blanc with grassy notes?", choices:["Italy","France","New Zealand","Spain"], a:2 },
+        { q:"Which region is MOST associated with Chianti wines?", choices:["Piedmont","Tuscany","Veneto","Sicily"], a:1 },
+        { q:"Which country is MOST associated with Valpolicella?", choices:["France","Italy","Spain","Portugal"], a:1 },
+        { q:"Which wine region is known for bold Cabernet Sauvignon?", choices:["Napa Valley","Loire Valley","Mosel","Alsace"], a:0 },
 
-    // ====== STATE ======
-    const KEY = "wine_onefile_v1";
-    let order = [];
-    let current = 0;
-    let answers = [];
-    let name = "";
+        { q:"Which wine on your list is a sparkling Italian wine?", choices:["Riondo Prosecco","Fleurs de Prairie Rosé","Kim Crawford Sauvignon Blanc","Bogle Merlot"], a:0 },
+        { q:"Which wine on your list would be BEST described as off-dry and aromatic?", choices:["Chateau Ste. Michelle Riesling","Caymus Cabernet Sauvignon","Ruffino Chianti","DAOU Cabernet Sauvignon"], a:0 },
+        { q:"Which wine on your list would MOST LIKELY pair with light seafood dishes?", choices:["Pinot Grigio","Cabernet Sauvignon","Red Blend","Chianti"], a:0 },
+        { q:"Which wine on your list is considered a luxury Napa Cabernet?", choices:["Josh Cellars Cabernet Sauvignon","Caymus Cabernet Sauvignon","Beringer Cabernet Sauvignon","Coppola Cabernet Sauvignon"], a:1 },
+        { q:"Which wine on your list is a French rosé?", choices:["Copper Ridge White Zinfandel","Fleurs de Prairie Rosé","Seven Daughters Moscato","La Marca Prosecco Rosé"], a:1 },
 
-    const startCard = document.getElementById("startCard");
-    const testCard = document.getElementById("testCard");
-    const resultsCard = document.getElementById("resultsCard");
+        { q:"Which wine does NOT belong with the others?", choices:["Pinot Grigio","Sauvignon Blanc","Chardonnay","Cabernet Sauvignon"], a:3 },
+        { q:"Which wine does NOT belong with the others?", choices:["Prosecco","Champagne","Moscato","Cabernet Sauvignon"], a:3 },
+        { q:"Which wine does NOT belong with the others?", choices:["Chianti","Valpolicella","Super Tuscan","Sauvignon Blanc"], a:3 },
+        { q:"Which wine does NOT belong with the others?", choices:["Merlot","Pinot Noir","Cabernet Sauvignon","Pinot Grigio"], a:3 },
+        { q:"Which wine does NOT belong with the others?", choices:["Rosé","White Zinfandel","Chardonnay","Cabernet Sauvignon"], a:3 },
 
-    const nameInput = document.getElementById("nameInput");
-    const startBtn = document.getElementById("startBtn");
-    const resetBtnTop = document.getElementById("resetBtnTop");
-    const resetBtn = document.getElementById("resetBtn");
+        { q:"Best wine for steak?", choices:["Pinot Grigio","Riesling","Cabernet Sauvignon","Prosecco"], a:2 },
+        { q:"Best wine for pasta with red sauce?", choices:["Sauvignon Blanc","Chianti","Moscato","Prosecco"], a:1 },
+        { q:"Best wine for salads or light appetizers?", choices:["Red Blend","Pinot Grigio","Merlot","Cabernet Sauvignon"], a:1 },
+        { q:"Best wine for dessert?", choices:["Cabernet Sauvignon","Moscato","Chianti","Pinot Noir"], a:1 },
+        { q:"Best wine for grilled chicken?", choices:["Chardonnay","Cabernet Sauvignon","Red Blend","Super Tuscan"], a:0 },
 
-    const whoName = document.getElementById("whoName");
-    const progressText = document.getElementById("progressText");
-    const qCount = document.getElementById("qCount");
-    const questionText = document.getElementById("questionText");
-    const optionsForm = document.getElementById("optionsForm");
+        { q:"Which wine is typically lighter-bodied?", choices:["Pinot Noir","Cabernet Sauvignon","Red Blend","Super Tuscan"], a:0 },
+        { q:"Which wine is MOST LIKELY to be bone-dry?", choices:["Moscato","Prosecco","Cabernet Sauvignon","Riesling"], a:2 },
+        { q:"Which wine style usually has tannins?", choices:["Sparkling wine","White wine","Red wine","Rosé"], a:2 },
+        { q:"Which wine is typically described as crisp?", choices:["Sauvignon Blanc","Merlot","Cabernet Sauvignon","Red Blend"], a:0 },
+        { q:"Which wine is MOST LIKELY aged in oak barrels?", choices:["Prosecco","Riesling","Cabernet Sauvignon","Moscato"], a:2 },
 
-    const backBtn = document.getElementById("backBtn");
-    const nextBtn = document.getElementById("nextBtn");
-    const finishBtn = document.getElementById("finishBtn");
+        { q:"Which wine would a guest choose if they want something not sweet?", choices:["Moscato","Cabernet Sauvignon","Prosecco","Rosé"], a:1 },
+        { q:"Which wine is MOST likely ordered by the glass at brunch?", choices:["Cabernet Sauvignon","Merlot","Prosecco","Chianti"], a:2 },
+        { q:"Which wine is MOST likely Italian?", choices:["Chianti","Riesling","Sauvignon Blanc","Cabernet Sauvignon"], a:0 },
+        { q:"Which wine is MOST likely French?", choices:["Prosecco","Champagne","Pinot Grigio","Moscato"], a:1 },
+        { q:"Which wine would be a safe recommendation for a new wine drinker?", choices:["Cabernet Sauvignon","Moscato","Super Tuscan","Chianti"], a:1 },
 
-    const rName = document.getElementById("rName");
-    const rScore = document.getElementById("rScore");
-    const rPct = document.getElementById("rPct");
-    const stamp = document.getElementById("stamp");
+        { q:"Which wine style is MOST refreshing?", choices:["Sauvignon Blanc","Red Blend","Cabernet Sauvignon","Merlot"], a:0 },
+        { q:"Which wine is typically not chilled?", choices:["Prosecco","Rosé","Cabernet Sauvignon","Pinot Grigio"], a:2 },
+        { q:"Which wine would pair best with cheese?", choices:["Moscato","Cabernet Sauvignon","Prosecco","Riesling"], a:1 },
+        { q:"Which wine is MOST likely bold and rich?", choices:["Pinot Grigio","Sauvignon Blanc","Cabernet Sauvignon","Moscato"], a:2 },
+        { q:"Which wine would NOT be described as sweet?", choices:["Moscato","Riesling","Cabernet Sauvignon","Prosecco"], a:2 },
 
-    const reviewBtn = document.getElementById("reviewBtn");
-    const restartBtn = document.getElementById("restartBtn");
-    const reviewWrap = document.getElementById("reviewWrap");
-    const missedList = document.getElementById("missedList");
+        { q:"Which wine is MOST common in Italy?", choices:["Pinot Grigio","Merlot","Cabernet Sauvignon","Chardonnay"], a:0 },
+        { q:"Which wine is MOST commonly red?", choices:["Sauvignon Blanc","Cabernet Sauvignon","Pinot Grigio","Prosecco"], a:1 },
+        { q:"Which wine would pair best with pizza?", choices:["Pinot Grigio","Chianti","Moscato","Prosecco"], a:1 },
+        { q:"Which wine is MOST likely crisp and dry?", choices:["Sauvignon Blanc","Moscato","Merlot","Red Blend"], a:0 },
+        { q:"Which wine style is MOST versatile for food?", choices:["Cabernet Sauvignon","Pinot Grigio","Red Blend","Sauvignon Blanc"], a:3 }
+      ];
 
-    function shuffle(a){
-      a = a.slice();
-      for(let i=a.length-1;i>0;i--){
-        const j=Math.floor(Math.random()*(i+1));
-        [a[i],a[j]]=[a[j],a[i]];
+      // =========================
+      //  DOM
+      // =========================
+      const startCard   = document.getElementById("startCard");
+      const testCard    = document.getElementById("testCard");
+      const resultsCard = document.getElementById("resultsCard");
+
+      const nameInput   = document.getElementById("nameInput");
+      const startBtn    = document.getElementById("startBtn");
+      const resetBtnTop = document.getElementById("resetBtnTop");
+
+      const whoName      = document.getElementById("whoName");
+      const progressText = document.getElementById("progressText");
+      const qCount       = document.getElementById("qCount");
+      const questionText = document.getElementById("questionText");
+      const optionsForm  = document.getElementById("optionsForm");
+
+      const backBtn   = document.getElementById("backBtn");
+      const nextBtn   = document.getElementById("nextBtn");
+      const finishBtn = document.getElementById("finishBtn");
+      const resetBtn  = document.getElementById("resetBtn");
+
+      const rName  = document.getElementById("rName");
+      const rScore = document.getElementById("rScore");
+      const rPct   = document.getElementById("rPct");
+      const stamp  = document.getElementById("stamp");
+
+      const reviewBtn  = document.getElementById("reviewBtn");
+      const restartBtn = document.getElementById("restartBtn");
+      const reviewWrap = document.getElementById("reviewWrap");
+      const missedList = document.getElementById("missedList");
+
+      // =========================
+      //  STATE
+      // =========================
+      let state = {
+        name: "",
+        idx: 0,
+        answers: Array(QUESTIONS.length).fill(null)
+      };
+
+      function save(){
+        try{ localStorage.setItem(KEY, JSON.stringify(state)); }catch{}
       }
-      return a;
-    }
 
-    function save(){
-      localStorage.setItem(KEY, JSON.stringify({order,current,answers,name}));
-    }
-    function load(){
-      try{
-        const raw = localStorage.getItem(KEY);
-        if(!raw) return false;
-        const d = JSON.parse(raw);
-        if(!d || !Array.isArray(d.order)) return false;
-        order = d.order;
-        current = d.current || 0;
-        answers = d.answers || Array(QUESTIONS.length).fill(null);
-        name = d.name || "";
-        return true;
-      }catch{return false}
-    }
-    function resetAll(){
-      localStorage.removeItem(KEY);
-      order=[]; current=0; answers=[]; name="";
-      nameInput.value="";
-      startCard.classList.remove("hidden");
-      testCard.classList.add("hidden");
-      resultsCard.classList.add("hidden");
-    }
+      function load(){
+        try{
+          const raw = localStorage.getItem(KEY);
+          if(!raw) return false;
+          const s = JSON.parse(raw);
+          if(!s || !Array.isArray(s.answers) || s.answers.length !== QUESTIONS.length) return false;
+          state = s;
+          return true;
+        }catch{ return false; }
+      }
 
-    function build(){
-      order = shuffle([...Array(QUESTIONS.length).keys()]);
-      answers = Array(QUESTIONS.length).fill(null);
-      current = 0;
-    }
+      function clear(){
+        try{ localStorage.removeItem(KEY); }catch{}
+      }
 
-    function render(){
-      const qi = order[current];
-      const q = QUESTIONS[qi];
-      whoName.textContent = name;
-      progressText.textContent = `${current+1}/${QUESTIONS.length}`;
-      qCount.textContent = `${current+1} of ${QUESTIONS.length}`;
-      questionText.textContent = q.q;
+      function show(el){ el.classList.remove("hidden"); }
+      function hide(el){ el.classList.add("hidden"); }
 
-      backBtn.disabled = current===0;
-      nextBtn.classList.toggle("hidden", current===QUESTIONS.length-1);
-      finishBtn.classList.toggle("hidden", current!==QUESTIONS.length-1);
+      function requireAnswered(){
+        const a = state.answers[state.idx];
+        nextBtn.disabled = (a === null);
+        finishBtn.disabled = (a === null);
+      }
 
-      optionsForm.innerHTML="";
-      q.c.forEach((text, idx)=>{
-        const id = `o_${qi}_${idx}`;
-        const label = document.createElement("label");
-        label.className = "opt";
-        label.htmlFor = id;
+      function render(){
+        const i = state.idx;
+        const q = QUESTIONS[i];
 
-        const input = document.createElement("input");
-        input.type="radio";
-        input.name=`q_${qi}`;
-        input.id=id;
-        input.checked = answers[qi]===idx;
+        whoName.textContent = state.name || "—";
+        progressText.textContent = `${i+1}/${QUESTIONS.length}`;
+        qCount.textContent = `${i+1} of ${QUESTIONS.length}`;
 
-        input.addEventListener("change", ()=>{
-          answers[qi]=idx;
-          save();
+        questionText.textContent = q.q;
+
+        backBtn.disabled = i === 0;
+
+        const last = i === QUESTIONS.length - 1;
+        nextBtn.classList.toggle("hidden", last);
+        finishBtn.classList.toggle("hidden", !last);
+
+        optionsForm.innerHTML = "";
+
+        q.choices.forEach((choiceText, idx) => {
+          const id = `q${i}_c${idx}`;
+
+          const label = document.createElement("label");
+          label.className = "opt";
+          label.setAttribute("for", id);
+
+          const input = document.createElement("input");
+          input.type = "radio";
+          input.name = `q_${i}`;
+          input.id = id;
+          input.value = String(idx);
+          input.checked = state.answers[i] === idx;
+
+          input.addEventListener("change", () => {
+            state.answers[i] = idx;
+            save();
+            requireAnswered();
+          });
+
+          const span = document.createElement("span");
+          span.className = "optText";
+          span.textContent = choiceText;
+
+          label.appendChild(input);
+          label.appendChild(span);
+          optionsForm.appendChild(label);
         });
 
-        const span = document.createElement("span");
-        span.className="optText";
-        span.textContent=text;
+        requireAnswered();
+        save();
+      }
 
-        label.appendChild(input);
-        label.appendChild(span);
-        optionsForm.appendChild(label);
+      function startTest(){
+        const nm = (nameInput.value || "").trim();
+        if(!nm){
+          alert("Enter your name.");
+          nameInput.focus();
+          return;
+        }
+        state.name = nm;
+
+        hide(startCard);
+        hide(resultsCard);
+        show(testCard);
+
+        render();
+      }
+
+      function resetAll(){
+        clear();
+        state = { name:"", idx:0, answers: Array(QUESTIONS.length).fill(null) };
+        nameInput.value = "";
+        hide(testCard);
+        hide(resultsCard);
+        show(startCard);
+      }
+
+      function grade(){
+        let correct = 0;
+        const missed = [];
+
+        for(let i=0;i<QUESTIONS.length;i++){
+          const q = QUESTIONS[i];
+          const chosen = state.answers[i];
+
+          if(chosen === q.a) correct++;
+          else{
+            missed.push({
+              num: i+1,
+              question: q.q,
+              your: (chosen === null ? "No answer selected" : q.choices[chosen]),
+              correct: q.choices[q.a]
+            });
+          }
+        }
+
+        const pct = Math.round((correct / QUESTIONS.length) * 100);
+        const pass = pct >= PASS_PCT;
+
+        rName.textContent = state.name;
+        rScore.textContent = `${correct}/${QUESTIONS.length}`;
+        rPct.textContent = `${pct}%`;
+
+        stamp.classList.remove("hidden","pass","fail");
+        stamp.textContent = pass ? "PASS" : "FAIL";
+        stamp.classList.add(pass ? "pass" : "fail");
+
+        missedList.innerHTML = "";
+        if(missed.length === 0){
+          const div = document.createElement("div");
+          div.className = "missedItem";
+          div.innerHTML = `<div class="q">Perfect score 🎉</div><div class="a">No missed questions.</div>`;
+          missedList.appendChild(div);
+        } else {
+          missed.forEach(m => {
+            const div = document.createElement("div");
+            div.className = "missedItem";
+            div.innerHTML = `
+              <div class="q">${m.num}. ${m.question}</div>
+              <div class="a"><strong>Your answer:</strong> ${m.your}</div>
+              <div class="a"><strong>Correct:</strong> ${m.correct}</div>
+            `;
+            missedList.appendChild(div);
+          });
+        }
+
+        reviewWrap.open = false;
+
+        hide(testCard);
+        hide(startCard);
+        show(resultsCard);
+
+        save();
+      }
+
+      // =========================
+      //  EVENTS
+      // =========================
+      startBtn.addEventListener("click", startTest);
+      resetBtnTop.addEventListener("click", resetAll);
+      resetBtn.addEventListener("click", resetAll);
+
+      backBtn.addEventListener("click", () => {
+        state.idx = Math.max(0, state.idx - 1);
+        save();
+        render();
       });
 
-      save();
-    }
+      nextBtn.addEventListener("click", () => {
+        if(state.answers[state.idx] === null) return;
+        state.idx = Math.min(QUESTIONS.length - 1, state.idx + 1);
+        save();
+        render();
+      });
 
-    function start(){
-      const nm = (nameInput.value||"").trim();
-      if(!nm){ alert("Enter your name."); nameInput.focus(); return; }
-      name = nm;
-      if(!order.length) build();
-      startCard.classList.add("hidden");
-      resultsCard.classList.add("hidden");
-      testCard.classList.remove("hidden");
-      render();
-    }
+      finishBtn.addEventListener("click", () => {
+        if(state.answers[state.idx] === null) return;
+        grade();
+      });
 
-    function grade(){
-      let correct=0;
-      const missed=[];
-      for(let pos=0; pos<order.length; pos++){
-        const qi = order[pos];
-        const q = QUESTIONS[qi];
-        if(answers[qi]===q.a) correct++;
-        else{
-          missed.push({num:pos+1, q:q.q, your:q.c[answers[qi]]||"No answer", correct:q.c[q.a]});
+      reviewBtn.addEventListener("click", () => {
+        reviewWrap.open = true;
+        reviewWrap.scrollIntoView({behavior:"smooth", block:"start"});
+      });
+
+      restartBtn.addEventListener("click", resetAll);
+
+      nameInput.addEventListener("keydown", (e) => {
+        if(e.key === "Enter"){
+          e.preventDefault();
+          startTest();
+        }
+      });
+
+      // =========================
+      //  BOOT
+      // =========================
+      const ok = load();
+      if(ok && state.name){
+        // Resume to test view if answers exist; otherwise start screen.
+        const anyAnswered = state.answers.some(a => a !== null);
+        if(anyAnswered){
+          hide(startCard);
+          hide(resultsCard);
+          show(testCard);
+          render();
+        } else {
+          nameInput.value = state.name;
         }
       }
-      const pct = Math.round((correct/QUESTIONS.length)*100);
-      rName.textContent=name;
-      rScore.textContent=`${correct}/${QUESTIONS.length}`;
-      rPct.textContent=`${pct}%`;
-
-      stamp.classList.remove("hidden","pass","fail");
-      const pass = pct>=PASS_PCT;
-      stamp.textContent = pass ? "PASS" : "FAIL";
-      stamp.classList.add(pass ? "pass" : "fail");
-
-      missedList.innerHTML="";
-      missed.forEach(m=>{
-        const div=document.createElement("div");
-        div.className="missedItem";
-        div.innerHTML=`<div class="q">${m.num}. ${m.q}</div>
-                       <div class="a"><b>Your answer:</b> ${m.your}</div>
-                       <div class="a"><b>Correct:</b> ${m.correct}</div>`;
-        missedList.appendChild(div);
-      });
-
-      testCard.classList.add("hidden");
-      resultsCard.classList.remove("hidden");
-      reviewWrap.open=false;
-      save();
-    }
-
-    // EVENTS
-    startBtn.addEventListener("click", start);
-    resetBtnTop.addEventListener("click", resetAll);
-    resetBtn.addEventListener("click", resetAll);
-    backBtn.addEventListener("click", ()=>{ current=Math.max(0,current-1); save(); render(); });
-    nextBtn.addEventListener("click", ()=>{ current=Math.min(QUESTIONS.length-1,current+1); save(); render(); });
-    finishBtn.addEventListener("click", grade);
-    reviewBtn.addEventListener("click", ()=>{ reviewWrap.open=true; reviewWrap.scrollIntoView({behavior:"smooth"}); });
-    restartBtn.addEventListener("click", resetAll);
-    nameInput.addEventListener("keydown", (e)=>{ if(e.key==="Enter"){ e.preventDefault(); start(); } });
-
-    // BOOT
-    const ok = load();
-    if(ok && name && order.length){
-      startCard.classList.add("hidden");
-      testCard.classList.remove("hidden");
-      render();
-    }
+    })();
   </script>
 </body>
 </html>
