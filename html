@@ -1,1 +1,122 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Wine Knowledge Test</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="page">
+    <header class="topbar">
+      <div>
+        <h1>🍷 Wine Knowledge Test</h1>
+        <p class="sub">No time limit • Multiple choice • Pass = 80%</p>
+      </div>
+      <div class="badge" id="statusBadge">Ready</div>
+    </header>
 
+    <main class="card">
+      <!-- START SCREEN -->
+      <section id="startScreen">
+        <h2>Server Certification</h2>
+        <p class="muted">Enter your name, take the test, then screenshot your results.</p>
+
+        <div class="formRow">
+          <label for="testName">Your Name</label>
+          <input id="testName" type="text" placeholder="e.g., Jordan Smith" autocomplete="name" />
+        </div>
+
+        <div class="infoGrid">
+          <div class="infoBox">
+            <div class="infoTitle">Questions</div>
+            <div class="infoValue" id="qCount">50</div>
+          </div>
+          <div class="infoBox">
+            <div class="infoTitle">Passing</div>
+            <div class="infoValue">80%</div>
+          </div>
+          <div class="infoBox">
+            <div class="infoTitle">Time Limit</div>
+            <div class="infoValue">None</div>
+          </div>
+        </div>
+
+        <div class="actions">
+          <button class="primary" id="startBtn">Start Test</button>
+        </div>
+
+        <p class="tiny muted">Tip: This is designed to be easy-to-moderate and practical for servers.</p>
+      </section>
+
+      <!-- TEST SCREEN -->
+      <section id="testScreen" class="hidden">
+        <div class="testHeader">
+          <div>
+            <h2 id="testTitle">Wine Test</h2>
+            <p class="muted" id="testMeta"></p>
+          </div>
+          <div class="progressWrap">
+            <div class="progressText" id="progressText">0/50 answered</div>
+            <div class="progressBar">
+              <div class="progressFill" id="progressFill" style="width:0%"></div>
+            </div>
+          </div>
+        </div>
+
+        <div id="questionList" class="questionList"></div>
+
+        <div class="stickyBar">
+          <button class="ghost" id="scrollTopBtn" type="button">↑ Top</button>
+          <button class="primary" id="submitBtn" type="button">Submit & Grade</button>
+        </div>
+      </section>
+
+      <!-- RESULTS SCREEN -->
+      <section id="resultsScreen" class="hidden">
+        <div class="resultsHeader">
+          <h2>Results</h2>
+          <p class="muted">Screenshot this screen and send to management.</p>
+        </div>
+
+        <div class="resultsCard" id="resultsCard">
+          <div class="resultsRow">
+            <div class="resultsLabel">Name</div>
+            <div class="resultsValue" id="resName">—</div>
+          </div>
+          <div class="resultsRow">
+            <div class="resultsLabel">Score</div>
+            <div class="resultsValue" id="resScore">—</div>
+          </div>
+          <div class="resultsRow">
+            <div class="resultsLabel">Result</div>
+            <div class="resultsValue" id="resPassFail">—</div>
+          </div>
+          <div class="resultsRow">
+            <div class="resultsLabel">Passing Rule</div>
+            <div class="resultsValue">80% (40/50)</div>
+          </div>
+          <div class="resultsRow">
+            <div class="resultsLabel">Date</div>
+            <div class="resultsValue" id="resDate">—</div>
+          </div>
+        </div>
+
+        <div class="actions">
+          <button class="ghost" id="printBtn" type="button">Print / Save PDF</button>
+          <button class="ghost" id="reviewBtn" type="button">Review Answers</button>
+          <button class="primary" id="restartBtn" type="button">Restart</button>
+        </div>
+
+        <div id="reviewPanel" class="reviewPanel hidden"></div>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <span class="muted tiny">Built for fast server certification • No timers • Simple grading</span>
+    </footer>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
