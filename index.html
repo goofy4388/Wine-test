@@ -4,12 +4,13 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Wine Knowledge Test</title>
-  <link rel="stylesheet" href="./style.css" />
-  <script src="./app.js" defer></script>
-</head>
-<body>
-  <div class="bg"></div>
 
+  <!-- ABSOLUTE PATHS for GitHub Pages project sites -->
+  <link rel="stylesheet" href="/Wine-test/style.css?v=1" />
+  <script src="/Wine-test/app.js?v=1" defer></script>
+</head>
+
+<body>
   <main class="wrap">
     <header class="hero">
       <div class="brand">
@@ -19,31 +20,33 @@
           <p class="sub">50 questions • Easy–Moderate • 80% to pass</p>
         </div>
       </div>
+
+      <!-- THIS MUST TURN GREEN if JS loads -->
+      <div id="statusPill" class="status red">JS: Not loaded</div>
     </header>
 
-    <section id="introScreen" class="card">
+    <section id="intro" class="card">
       <h2>Start</h2>
-      <p class="muted">Enter your name, then press <b>Start Test</b>. When finished, take a screenshot of your results.</p>
+      <p class="muted">Enter your name, press <b>Start Test</b>. When finished, screenshot your results.</p>
 
       <div class="formRow">
-        <label for="testerName">Your Name</label>
-        <input id="testerName" type="text" placeholder="First + Last name" autocomplete="name" />
+        <label for="nameInput">Your Name</label>
+        <input id="nameInput" type="text" placeholder="First + Last name" autocomplete="name" />
       </div>
 
       <div class="btnRow">
-        <button id="startTestBtn" class="btn primary" type="button">Start Test</button>
+        <button id="startBtn" class="btn primary" type="button">Start Test</button>
       </div>
 
-      <div id="introError" class="error" aria-live="polite"></div>
+      <div id="introError" class="error"></div>
     </section>
 
-    <section id="quizScreen" class="card hidden">
+    <section id="quiz" class="card hidden">
       <div class="quizTop">
         <div>
-          <h2 id="quizTitle">Question</h2>
-          <p class="muted" id="progressText">1 of 50</p>
+          <h2 id="qTitle">Question</h2>
+          <p class="muted" id="progress">1 of 50</p>
         </div>
-
         <div class="pill">
           <span class="pillLabel">Name:</span>
           <span id="namePill">—</span>
@@ -51,40 +54,40 @@
       </div>
 
       <div class="questionBox">
-        <h3 id="questionText">Loading…</h3>
+        <h3 id="qText">Loading…</h3>
       </div>
 
-      <div id="answersBox" class="answers" role="group" aria-label="Answer choices"></div>
+      <div id="choices" class="answers"></div>
 
       <div class="navRow">
-        <button id="prevBtn" class="btn" type="button">← Back</button>
+        <button id="backBtn" class="btn" type="button">← Back</button>
         <button id="nextBtn" class="btn primary" type="button">Next →</button>
       </div>
 
-      <div id="quizError" class="error" aria-live="polite"></div>
+      <div id="quizError" class="error"></div>
     </section>
 
-    <section id="resultsScreen" class="card hidden">
+    <section id="results" class="card hidden">
       <div class="resultsHeader">
         <div>
           <h2>Results</h2>
-          <p class="muted">Screenshot this page and send it in.</p>
+          <p class="muted">Screenshot this result and send it in.</p>
         </div>
-        <div class="stamp" id="passStamp">PASS</div>
+        <div id="stamp" class="stamp">PASS</div>
       </div>
 
       <div class="resultsGrid">
         <div class="resultTile">
           <div class="tileLabel">Name</div>
-          <div class="tileValue" id="resultName">—</div>
+          <div class="tileValue" id="rName">—</div>
         </div>
         <div class="resultTile">
           <div class="tileLabel">Score</div>
-          <div class="tileValue" id="resultScore">—</div>
+          <div class="tileValue" id="rScore">—</div>
         </div>
         <div class="resultTile">
           <div class="tileLabel">Percent</div>
-          <div class="tileValue" id="resultPercent">—</div>
+          <div class="tileValue" id="rPct">—</div>
         </div>
         <div class="resultTile">
           <div class="tileLabel">Passing</div>
@@ -93,16 +96,7 @@
       </div>
 
       <div class="btnRow">
-        <button id="reviewBtn" class="btn" type="button">Review Answers</button>
         <button id="restartBtn" class="btn primary" type="button">Restart</button>
-      </div>
-
-      <div id="reviewWrap" class="review hidden">
-        <div class="reviewTop">
-          <h3>Answer Review</h3>
-          <button id="hideReviewBtn" class="btn small" type="button">Hide</button>
-        </div>
-        <div id="reviewList" class="reviewList"></div>
       </div>
     </section>
 
