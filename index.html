@@ -1,122 +1,119 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Wine Knowledge Test</title>
-  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="css/style.css" />
+  <script src="js/app.js" defer></script>
 </head>
 <body>
-  <div class="page">
-    <header class="topbar">
-      <div>
-        <h1>🍷 Wine Knowledge Test</h1>
-        <p class="sub">No time limit • Multiple choice • Pass = 80%</p>
+  <div class="bg"></div>
+
+  <main class="wrap">
+    <header class="hero">
+      <div class="brand">
+        <div class="logo">🍷</div>
+        <div>
+          <h1>Wine Knowledge Test</h1>
+          <p class="sub">50 questions • Easy–Moderate • 80% to pass</p>
+        </div>
       </div>
-      <div class="badge" id="statusBadge">Ready</div>
     </header>
 
-    <main class="card">
-      <!-- START SCREEN -->
-      <section id="startScreen">
-        <h2>Server Certification</h2>
-        <p class="muted">Enter your name, take the test, then screenshot your results.</p>
+    <!-- INTRO -->
+    <section id="introScreen" class="card">
+      <h2>Start</h2>
+      <p class="muted">
+        Enter your name, then press <b>Start Test</b>. When finished, take a screenshot of your results.
+      </p>
 
-        <div class="formRow">
-          <label for="testName">Your Name</label>
-          <input id="testName" type="text" placeholder="e.g., Jordan Smith" autocomplete="name" />
+      <div class="formRow">
+        <label for="testerName">Your Name</label>
+        <input id="testerName" type="text" placeholder="First + Last name" autocomplete="name" />
+      </div>
+
+      <div class="btnRow">
+        <button id="startTestBtn" class="btn primary" type="button">Start Test</button>
+      </div>
+
+      <div id="introError" class="error" aria-live="polite"></div>
+    </section>
+
+    <!-- QUIZ -->
+    <section id="quizScreen" class="card hidden">
+      <div class="quizTop">
+        <div>
+          <h2 id="quizTitle">Question</h2>
+          <p class="muted" id="progressText">1 of 50</p>
         </div>
 
-        <div class="infoGrid">
-          <div class="infoBox">
-            <div class="infoTitle">Questions</div>
-            <div class="infoValue" id="qCount">50</div>
-          </div>
-          <div class="infoBox">
-            <div class="infoTitle">Passing</div>
-            <div class="infoValue">80%</div>
-          </div>
-          <div class="infoBox">
-            <div class="infoTitle">Time Limit</div>
-            <div class="infoValue">None</div>
-          </div>
+        <div class="pill">
+          <span class="pillLabel">Name:</span>
+          <span id="namePill">—</span>
         </div>
+      </div>
 
-        <div class="actions">
-          <button class="primary" id="startBtn">Start Test</button>
-        </div>
+      <div class="questionBox">
+        <h3 id="questionText">Loading…</h3>
+      </div>
 
-        <p class="tiny muted">Tip: This is designed to be easy-to-moderate and practical for servers.</p>
-      </section>
+      <div id="answersBox" class="answers" role="group" aria-label="Answer choices"></div>
 
-      <!-- TEST SCREEN -->
-      <section id="testScreen" class="hidden">
-        <div class="testHeader">
-          <div>
-            <h2 id="testTitle">Wine Test</h2>
-            <p class="muted" id="testMeta"></p>
-          </div>
-          <div class="progressWrap">
-            <div class="progressText" id="progressText">0/50 answered</div>
-            <div class="progressBar">
-              <div class="progressFill" id="progressFill" style="width:0%"></div>
-            </div>
-          </div>
-        </div>
+      <div class="navRow">
+        <button id="prevBtn" class="btn" type="button">← Back</button>
+        <button id="nextBtn" class="btn primary" type="button">Next →</button>
+      </div>
 
-        <div id="questionList" class="questionList"></div>
+      <div id="quizError" class="error" aria-live="polite"></div>
+    </section>
 
-        <div class="stickyBar">
-          <button class="ghost" id="scrollTopBtn" type="button">↑ Top</button>
-          <button class="primary" id="submitBtn" type="button">Submit & Grade</button>
-        </div>
-      </section>
-
-      <!-- RESULTS SCREEN -->
-      <section id="resultsScreen" class="hidden">
-        <div class="resultsHeader">
+    <!-- RESULTS -->
+    <section id="resultsScreen" class="card hidden">
+      <div class="resultsHeader">
+        <div>
           <h2>Results</h2>
-          <p class="muted">Screenshot this screen and send to management.</p>
+          <p class="muted">Screenshot this page and send it in.</p>
         </div>
+        <div class="stamp" id="passStamp">PASS</div>
+      </div>
 
-        <div class="resultsCard" id="resultsCard">
-          <div class="resultsRow">
-            <div class="resultsLabel">Name</div>
-            <div class="resultsValue" id="resName">—</div>
-          </div>
-          <div class="resultsRow">
-            <div class="resultsLabel">Score</div>
-            <div class="resultsValue" id="resScore">—</div>
-          </div>
-          <div class="resultsRow">
-            <div class="resultsLabel">Result</div>
-            <div class="resultsValue" id="resPassFail">—</div>
-          </div>
-          <div class="resultsRow">
-            <div class="resultsLabel">Passing Rule</div>
-            <div class="resultsValue">80% (40/50)</div>
-          </div>
-          <div class="resultsRow">
-            <div class="resultsLabel">Date</div>
-            <div class="resultsValue" id="resDate">—</div>
-          </div>
+      <div class="resultsGrid">
+        <div class="resultTile">
+          <div class="tileLabel">Name</div>
+          <div class="tileValue" id="resultName">—</div>
         </div>
-
-        <div class="actions">
-          <button class="ghost" id="printBtn" type="button">Print / Save PDF</button>
-          <button class="ghost" id="reviewBtn" type="button">Review Answers</button>
-          <button class="primary" id="restartBtn" type="button">Restart</button>
+        <div class="resultTile">
+          <div class="tileLabel">Score</div>
+          <div class="tileValue" id="resultScore">—</div>
         </div>
+        <div class="resultTile">
+          <div class="tileLabel">Percent</div>
+          <div class="tileValue" id="resultPercent">—</div>
+        </div>
+        <div class="resultTile">
+          <div class="tileLabel">Passing</div>
+          <div class="tileValue">80%</div>
+        </div>
+      </div>
 
-        <div id="reviewPanel" class="reviewPanel hidden"></div>
-      </section>
-    </main>
+      <div class="btnRow">
+        <button id="reviewBtn" class="btn" type="button">Review Answers</button>
+        <button id="restartBtn" class="btn primary" type="button">Restart</button>
+      </div>
 
-    <footer class="footer">
-      <span class="muted tiny">Built for fast server certification • No timers • Simple grading</span>
+      <div id="reviewWrap" class="review hidden">
+        <div class="reviewTop">
+          <h3>Answer Review</h3>
+          <button id="hideReviewBtn" class="btn small" type="button">Hide</button>
+        </div>
+        <div id="reviewList" class="reviewList"></div>
+      </div>
+    </section>
+
+    <footer class="foot">
+      <span class="muted">Local-only. No data is sent anywhere.</span>
     </footer>
-  </div>
-
-  <script src="js/app.js" defer></script>
+  </main>
 </body>
 </html>
