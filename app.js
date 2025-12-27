@@ -1,225 +1,421 @@
-// ====== STATUS PILL: proves JS loaded ======
-const statusPill = document.getElementById("statusPill");
-statusPill.textContent = "JS: Loaded";
-statusPill.classList.remove("red");
-statusPill.classList.add("green");
+(() => {
+  const PASSING_PCT = 80; // 80% to pass
+  const REVIEW_MODE_AFTER_FINISH = false; // keep FALSE to never show correct answers
 
-// ====== QUESTION BANK (50) ======
-const QUESTIONS = [
-  // Easy / moderate knowledge based on the wine list you sent (brands/regions/styles)
+  // ============ DOM IDs expected in your HTML ============
+  // startBtn, nameInput
+  // qSection, qNum, qText, choicesWrap, backBtn, nextBtn
+  // resultsSection, rName, rScore, rPct, stamp, restartBtn
+  // If your IDs differ, rename them here.
+  const el = (id) => document.getElementById(id);
 
-  { q:"Which wine is a Cabernet Sauvignon from Napa Valley?", a:["Caymus","Kim Crawford","Riondo","Meiomi"], c:0 },
-  { q:"Which wine is a Sauvignon Blanc from New Zealand?", a:["Kim Crawford","Rombauer","Josh Cellars","Cecchi Classico"], c:0 },
-  { q:"Which wine is a Prosecco (sparkling) from Italy?", a:["Riondo","Duckhorn Decoy","Caymus","Beringer Founders Estate"], c:0 },
-  { q:"Which champagne brand listed is from France?", a:["Veuve Clicquot Yellow Label","La Marca Prosecco Rosé","Riondo Prosecco","Seven Daughters Moscato"], c:0 },
-  { q:"Which wine is a Riesling from Washington?", a:["Chateau Ste. Michelle","Apothic","Mark West","Coppola Diamond"], c:0 },
+  const startBtn = el("startBtn");
+  const nameInput = el("nameInput");
 
-  { q:"Which is a Pinot Grigio commonly associated with Italy?", a:["Santa Margherita","Josh Cellars","Duckhorn Goldeneye","The Prisoner"], c:0 },
-  { q:"Which wine is known as a California Pinot Noir brand?", a:["Meiomi","Allegrini Valpolicella","Ruffino DOCG","Il Borro ‘Pian di Nova’"], c:0 },
-  { q:"Which wine is a Chardonnay from California (widely sold)?", a:["Kendall-Jackson","Ecco Domani","Kim Crawford","Riondo"], c:0 },
-  { q:"Which wine is a Super Tuscan from Tuscany?", a:["Il Borro ‘Pian di Nova’","Bogle Merlot","Mark West Pinot Noir","Beringer Founders Estate Cabernet"], c:0 },
-  { q:"Which brand is known for buttery/rich Chardonnay style?", a:["Rombauer","Seven Daughters","Chloe","Fleurs de Prairie"], c:0 },
+  const qSection = el("qSection");
+  const qNum = el("qNum");
+  const qText = el("qText");
+  const choicesWrap = el("choicesWrap");
+  const backBtn = el("backBtn");
+  const nextBtn = el("nextBtn");
 
-  { q:"Which is a red blend from California often served by the glass?", a:["Apothic","Chateau Ste. Michelle","Riondo","Santa Margherita"], c:0 },
-  { q:"Which is a red blend known for bold, dark fruit style?", a:["The Prisoner","Copper Ridge","Fleurs de Prairie","La Marca"], c:0 },
-  { q:"Which is a Chianti (Italy) option listed?", a:["Ruffino DOCG","Kim Crawford","Josh Cellars","Bogle"], c:0 },
-  { q:"Which is a Chianti Classico (Italy) option listed?", a:["Cecchi","Ruffino","Mark West","Beringer"], c:0 },
-  { q:"Which is a Valpolicella from Verona (Italy)?", a:["Allegrini","Orin Swift","DAOU","Conundrum"], c:0 },
+  const resultsSection = el("resultsSection");
+  const rName = el("rName");
+  const rScore = el("rScore");
+  const rPct = el("rPct");
+  const stamp = el("stamp");
+  const restartBtn = el("restartBtn");
 
-  { q:"Which is a Merlot brand listed?", a:["Bogle","Veuve Clicquot","Kim Crawford","Riondo"], c:0 },
-  { q:"Which is a Merlot (Sonoma) brand listed?", a:["Duckhorn ‘Decoy’","Seven Daughters","Caymus","Riondo"], c:0 },
-  { q:"Which wine is a Cabernet Sauvignon brand listed?", a:["Josh Cellars","Ecco Domani","Fleurs de Prairie","Mark West"], c:0 },
-  { q:"Which wine is a Paso Robles Cabernet listed?", a:["J. Lohr ‘Seven Oaks’ Cabernet","Cecchi Chianti Classico","Allegrini Valpolicella","Riondo Prosecco"], c:0 },
-  { q:"Which wine is a Napa Cabernet listed (premium)?", a:["Stag’s Leap Artemis","Copper Ridge","Chateau Ste. Michelle","La Marca"], c:0 },
+  // ============ Wine data (from your list) ============
+  // NOTE: This is used only to build harder questions.
+  const WINES = [
+    { n: "Caymus Cabernet Sauvignon (Napa Valley)", t: "Red", g: "Cabernet Sauvignon", r: "Napa Valley, California", c: "USA" },
+    { n: "Stag's Leap Artemis Cabernet Sauvignon", t: "Red", g: "Cabernet Sauvignon", r: "Napa Valley, California", c: "USA" },
+    { n: "J. Lohr 'Seven Oaks' Cabernet Sauvignon", t: "Red", g: "Cabernet Sauvignon", r: "Paso Robles, California", c: "USA" },
+    { n: "DAOU Cabernet Sauvignon", t: "Red", g: "Cabernet Sauvignon", r: "Paso Robles, California", c: "USA" },
+    { n: "Josh Cellars Cabernet Sauvignon", t: "Red", g: "Cabernet Sauvignon", r: "California", c: "USA" },
+    { n: "Beringer Founders' Estate Cabernet Sauvignon", t: "Red", g: "Cabernet Sauvignon", r: "California", c: "USA" },
+    { n: "Coppola Diamond Cabernet Sauvignon", t: "Red", g: "Cabernet Sauvignon", r: "California", c: "USA" },
 
-  { q:"Which is a Moscato from Italy?", a:["Seven Daughters","Duckhorn Goldeneye","Beringer","Coppola Diamond"], c:0 },
-  { q:"Which is a Rosé brand listed?", a:["Fleurs de Prairie","Orin Swift","DAOU","Duckhorn Decoy"], c:0 },
-  { q:"Which is a Prosecco Rosé brand listed?", a:["La Marca Prosecco","Veuve Clicquot Brut","Kim Crawford Sauvignon Blanc","Caymus Cabernet"], c:0 },
-  { q:"Which is a Sauvignon Blanc from California listed?", a:["Quilt ‘Threadcount’ ","Allegrini","Ruffino","Riondo"], c:0 },
-  { q:"Which is a Sonoma Sauvignon Blanc brand listed?", a:["Imagery","Josh Cellars","Caymus ","Veuve Clicquot"], c:0 },
+    { n: "Bogle Merlot", t: "Red", g: "Merlot", r: "California", c: "USA" },
+    { n: "Duckhorn 'Decoy' Merlot", t: "Red", g: "Merlot", r: "Sonoma County, California", c: "USA" },
 
-  { q:"A ‘red blend’ means:", a:["Blend of multiple red grapes","A sweet sparkling wine","A white wine with bubbles","A wine only from France"], c:0 },
-  { q:"Which grape is typically used for Pinot Noir?", a:["Pinot Noir grape","Cabernet Sauvignon grape","Riesling grape","Moscato grape"], c:0 },
-  { q:"Which style is typically crisp/acidic?", a:["Sauvignon Blanc","Merlot","Cabernet Sauvignon","Red Blend"], c:0 },
-  { q:"Which is typically light-bodied (compared to Cab)?", a:["Pinot Noir","Cabernet Sauvignon","Red Blend","Merlot"], c:0 },
-  { q:"Which is typically sparkling?", a:["Prosecco","Merlot","Cabernet Sauvignon","Chianti"], c:0 },
+    { n: "The Prisoner Red Blend", t: "Red", g: "Red Blend", r: "California", c: "USA" },
+    { n: "Orin Swift 'Abstract' Red Blend", t: "Red", g: "Red Blend", r: "California", c: "USA" },
+    { n: "DAOU 'Pessimist' Red Blend", t: "Red", g: "Red Blend", r: "California", c: "USA" },
+    { n: "Apothic Red Blend", t: "Red", g: "Red Blend", r: "California", c: "USA" },
+    { n: "Conundrum Red Blend", t: "Red", g: "Red Blend", r: "California", c: "USA" },
 
-  { q:"Which wine is an Orin Swift brand listed?", a:[" ‘Abstract’","Prosecco","Sauvignon Blanc","Chianti Classico"], c:0 },
-  { q:"Which wine is a DAOU brand listed?", a:["‘Pessimist’","Rombauer Chardonnay","Veuve Clicquot Brut","Fleurs de Prairie Rosé"], c:0 },
-  { q:"Which wine is a DAOU Cabernet listed?", a:["Cabernet Sauvignon","Coppola Cabernet","Moscato","Riondo Prosecco"], c:0 },
-  { q:"Which wine is a Coppola brand listed?", a:["Diamond Cabernet","Allegrini Valpolicella","Il Borro Super Tuscan","La Marca Prosecco Rosé"], c:0 },
-  { q:"Which wine is a Beringer brand listed?", a:["Founders’ Estate Cabernet","Kim Crawford Sauvignon Blanc","Riondo Prosecco","Cecchi Chianti Classico"], c:0 },
+    { n: "Mark West Pinot Noir", t: "Red", g: "Pinot Noir", r: "California", c: "USA" },
+    { n: "Meiomi Pinot Noir", t: "Red", g: "Pinot Noir", r: "California", c: "USA" },
+    { n: "Belle Glos 'Balade' Pinot Noir", t: "Red", g: "Pinot Noir", r: "California", c: "USA" },
+    { n: "Duckhorn 'Goldeneye' Pinot Noir", t: "Red", g: "Pinot Noir", r: "California", c: "USA" },
 
-  { q:"If a guest wants a ‘buttery’ white, best pick is:", a:["Rombauer Chardonnay","Chateau Ste. Michelle Riesling","Kim Crawford Sauvignon Blanc","Santa Margherita Pinot Grigio"], c:0 },
-  { q:"If a guest wants ‘dry bubbles’, best pick is:", a:["Veuve Clicquot Brut","Seven Daughters Moscato","Copper Ridge White Zinfandel","Kim Crawford Sauvignon Blanc"], c:0 },
-  { q:"If a guest wants a ‘sweet-ish’ wine, best pick is:", a:["Moscato","Cabernet Sauvignon","Chianti","Merlot"], c:0 },
-  { q:"If a guest wants ‘very bold red blend’, best pick is:", a:["The Prisoner Red Blend","Fleurs de Prairie Rosé","Riondo Prosecco","Chloe Pinot Grigio"], c:0 },
-  { q:"If a guest wants ‘light, easy red’, best pick is:", a:["Mark West Pinot Noir","Caymus Cabernet Sauvignon","Stag’s Leap Artemis","DAOU Cabernet Sauvignon"], c:0 },
+    { n: "Riondo Prosecco", t: "Sparkling", g: "Prosecco (Glera)", r: "Italy", c: "Italy" },
+    { n: "LaMarca Prosecco Rosé", t: "Sparkling", g: "Prosecco Rosé", r: "Italy", c: "Italy" },
+    { n: "Veuve Clicquot Yellow Label Brut", t: "Sparkling", g: "Champagne Blend", r: "France", c: "France" },
 
-  { q:"Which wine is a Goldeneye (Pinot Noir) brand listed?", a:["Duckhorn ‘Goldeneye’","Riondo Prosecco","Veuve Clicquot Brut","Il Borro ‘Pian di Nova’"], c:0 },
-  { q:"Which wine is a Belle Glos Pinot Noir listed?", a:["‘Balade’","Bogle Merlot","Coppola Diamond Cabernet","Kendall-Jackson Chardonnay"], c:0 },
-  { q:"Which is a ‘white zinfandel’ style listed?", a:["Copper Ridge","Josh Cellars","Cecchi Classico","Duckhorn Decoy Merlot"], c:0 },
-  { q:"Pinot Grigio is generally:", a:["Light and crisp","Heavy and tannic","Sparkling sweet","Always fortified"], c:0 },
-  { q:"Cabernet Sauvignon is generally:", a:["Full-bodied with tannins","Light-bodied with no tannins","Sparkling and sweet","Always rosé"], c:0 },
+    { n: "Seven Daughters Moscato", t: "White", g: "Moscato", r: "Italy", c: "Italy" },
+    { n: "Copper Ridge White Zinfandel", t: "Rosé", g: "White Zinfandel", r: "California", c: "USA" },
+    { n: "Chateau Ste. Michelle Riesling", t: "White", g: "Riesling", r: "Washington", c: "USA" },
+    { n: "Fleurs de Prairie Rosé", t: "Rosé", g: "Rosé Blend", r: "France", c: "France" },
 
-  { q:"Chianti is from:", a:["Italy","France","New Zealand","Washington"], c:0 },
-  { q:"Prosecco is from:", a:["Italy","Napa Valley","Washington","France"], c:0 },
-  { q:"Veuve Clicquot is from:", a:["France","Italy","New Zealand","Sonoma"], c:0 },
-  { q:"Kim Crawford Sauvignon Blanc is from:", a:["New Zealand","Italy","France","Washington"], c:0 },
-  { q:"Caymus Cabernet Sauvignon is from:", a:["Napa Valley","Verona","Tuscany","Washington"], c:0 },
+    { n: "Ecco Domani Pinot Grigio", t: "White", g: "Pinot Grigio", r: "Italy", c: "Italy" },
+    { n: "Chloe Pinot Grigio", t: "White", g: "Pinot Grigio", r: "Italy", c: "Italy" },
+    { n: "Santa Margherita Pinot Grigio", t: "White", g: "Pinot Grigio", r: "Italy", c: "Italy" },
+    { n: "Bonizio Bianco by Cecchi", t: "White", g: "Italian White Blend", r: "Tuscany, Italy", c: "Italy" },
 
-  { q:"To PASS this test you need:", a:["80% or higher","60% or higher","50% or higher","100% only"], c:0 },
-];
+    { n: "Imagery Sauvignon Blanc", t: "White", g: "Sauvignon Blanc", r: "Sonoma, California", c: "USA" },
+    { n: "Quilt 'Threadcount' Sauvignon Blanc", t: "White", g: "Sauvignon Blanc", r: "California", c: "USA" },
+    { n: "Kim Crawford Sauvignon Blanc", t: "White", g: "Sauvignon Blanc", r: "New Zealand", c: "New Zealand" },
 
-// ====== STATE ======
-const PASSING = 0.80;
+    { n: "Antinori 'Tormaresca' (Chardonnay)", t: "White", g: "Chardonnay", r: "Italy", c: "Italy" },
+    { n: "William Hill Chardonnay", t: "White", g: "Chardonnay", r: "California", c: "USA" },
+    { n: "Kendall-Jackson Chardonnay", t: "White", g: "Chardonnay", r: "California", c: "USA" },
+    { n: "Rombauer Chardonnay", t: "White", g: "Chardonnay", r: "California", c: "USA" },
 
-let idx = 0;
-let name = "";
-let answers = new Array(QUESTIONS.length).fill(null);
+    { n: "Allegrini Valpolicella", t: "Red", g: "Valpolicella Blend", r: "Verona, Italy", c: "Italy" },
+    { n: "Ruffino Chianti DOCG", t: "Red", g: "Sangiovese (Chianti)", r: "Tuscany, Italy", c: "Italy" },
+    { n: "Cecchi Chianti Classico", t: "Red", g: "Sangiovese (Chianti Classico)", r: "Tuscany, Italy", c: "Italy" },
+    { n: "Bonizio Rosso by Cecchi", t: "Red", g: "Italian Red Blend", r: "Italy", c: "Italy" },
+    { n: "Il Borro 'Pian di Nova' (Super Tuscan)", t: "Red", g: "Super Tuscan Blend", r: "Tuscany, Italy", c: "Italy" },
+  ];
 
-// ====== ELEMENTS ======
-const intro = document.getElementById("intro");
-const quiz = document.getElementById("quiz");
-const results = document.getElementById("results");
+  // ============ Helper utilities ============
+  const shuffle = (arr) => {
+    const a = arr.slice();
+    for (let i = a.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [a[i], a[j]] = [a[j], a[i]];
+    }
+    return a;
+  };
 
-const nameInput = document.getElementById("nameInput");
-const startBtn = document.getElementById("startBtn");
-const introError = document.getElementById("introError");
+  const pick = (arr) => arr[Math.floor(Math.random() * arr.length)];
 
-const qText = document.getElementById("qText");
-const progress = document.getElementById("progress");
-const namePill = document.getElementById("namePill");
-const choicesBox = document.getElementById("choices");
-const quizError = document.getElementById("quizError");
-const backBtn = document.getElementById("backBtn");
-const nextBtn = document.getElementById("nextBtn");
+  const unique = (arr) => [...new Set(arr)];
 
-const rName = document.getElementById("rName");
-const rScore = document.getElementById("rScore");
-const rPct = document.getElementById("rPct");
-const stamp = document.getElementById("stamp");
-const restartBtn = document.getElementById("restartBtn");
+  const byGrape = (g) => WINES.filter((w) => w.g === g);
+  const byCountry = (c) => WINES.filter((w) => w.c === c);
+  const byType = (t) => WINES.filter((w) => w.t === t);
 
-// ====== HELPERS ======
-function show(el){ el.classList.remove("hidden"); }
-function hide(el){ el.classList.add("hidden"); }
+  // ============ HARDER QUESTION GENERATORS ============
+  // IMPORTANT: Question text never contains the correct answer.
+  // Choices are full statements/pairings so user must KNOW.
+  function qCorrectPairing() {
+    // Choose a wine, then ask which pairing is correct (wine -> grape OR wine -> region OR wine -> type)
+    const w = pick(WINES);
+    const mode = pick(["grape", "region", "type"]);
 
-function render(){
-  const q = QUESTIONS[idx];
-  progress.textContent = `${idx + 1} of ${QUESTIONS.length}`;
-  qText.textContent = q.q;
+    const correct =
+      mode === "grape"
+        ? `${w.n} — ${w.g}`
+        : mode === "region"
+        ? `${w.n} — ${w.r}`
+        : `${w.n} — ${w.t}`;
 
-  choicesBox.innerHTML = "";
-  q.a.forEach((label, i) => {
-    const row = document.createElement("label");
-    row.className = "choice";
+    // Build wrong options by mixing other wines’ attributes
+    const wrongs = unique(
+      shuffle(WINES)
+        .filter((x) => x.n !== w.n)
+        .slice(0, 8)
+        .map((x) => {
+          if (mode === "grape") return `${w.n} — ${x.g}`;
+          if (mode === "region") return `${w.n} — ${x.r}`;
+          return `${w.n} — ${x.t}`;
+        })
+    ).filter((x) => x !== correct);
 
-    const radio = document.createElement("input");
-    radio.type = "radio";
-    radio.name = "choice";
-    radio.value = String(i);
-    radio.checked = answers[idx] === i;
+    const options = shuffle([correct, ...wrongs.slice(0, 3)]);
+    const prompt =
+      mode === "grape"
+        ? "Which pairing is correct?"
+        : mode === "region"
+        ? "Which pairing is correct?"
+        : "Which pairing is correct?";
 
-    radio.addEventListener("change", () => {
-      answers[idx] = i;
-      quizError.textContent = "";
-    });
+    return { prompt, stem: `Select the correct match for the wine shown:`, context: w.n, options, answer: correct };
+  }
 
-    const text = document.createElement("div");
-    text.textContent = label;
+  function qOddOneOut() {
+    // 3 share same grape/type/country; 1 is different
+    const mode = pick(["grape", "type", "country"]);
 
-    row.appendChild(radio);
-    row.appendChild(text);
-    choicesBox.appendChild(row);
-  });
+    let group = [];
+    let odd = null;
 
-  backBtn.disabled = idx === 0;
-  nextBtn.textContent = idx === QUESTIONS.length - 1 ? "Finish →" : "Next →";
-}
+    if (mode === "country") {
+      // Choose a country with >= 3 wines
+      const candidateCountries = unique(WINES.map((w) => w.c)).filter((c) => byCountry(c).length >= 3);
+      const c = pick(candidateCountries);
+      group = shuffle(byCountry(c)).slice(0, 3);
 
-function score(){
-  let correct = 0;
-  QUESTIONS.forEach((q, i) => {
-    if (answers[i] === q.c) correct++;
-  });
-  return correct;
-}
+      // odd from different country
+      odd = pick(WINES.filter((w) => w.c !== c));
+    } else if (mode === "type") {
+      const candidateTypes = unique(WINES.map((w) => w.t)).filter((t) => byType(t).length >= 3);
+      const t = pick(candidateTypes);
+      group = shuffle(byType(t)).slice(0, 3);
+      odd = pick(WINES.filter((w) => w.t !== t));
+    } else {
+      const candidateGrapes = unique(WINES.map((w) => w.g)).filter((g) => byGrape(g).length >= 3);
+      const g = pick(candidateGrapes);
+      group = shuffle(byGrape(g)).slice(0, 3);
+      odd = pick(WINES.filter((w) => w.g !== g));
+    }
 
-function finish(){
-  const correct = score();
-  const total = QUESTIONS.length;
-  const pct = correct / total;
+    const options = shuffle([...group.map((w) => w.n), odd.n]);
+    return {
+      prompt: "Which option does NOT belong with the other three?",
+      stem: "Choose the odd one out.",
+      context: "",
+      options,
+      answer: odd.n
+    };
+  }
 
-  rName.textContent = name;
-  rScore.textContent = `${correct} / ${total}`;
-  rPct.textContent = `${Math.round(pct * 100)}%`;
+  function qCategoryCheck() {
+    // Ask: Which list contains ONLY wines from X category (harder because it’s a set)
+    const mode = pick(["ItalyOnly", "SparklingOnly", "CabernetOnly", "PinotGrigioOnly"]);
+    let correctSet = [];
+    let wrongSet1 = [];
+    let wrongSet2 = [];
+    let wrongSet3 = [];
+    let prompt = "Which set is correct?";
+    let stem = "";
 
-  if (pct >= PASSING){
-    stamp.textContent = "PASS";
-    stamp.classList.remove("fail");
+    if (mode === "ItalyOnly") {
+      stem = "Pick the set that contains ONLY wines from Italy.";
+      correctSet = shuffle(byCountry("Italy")).slice(0, 3).map((w) => w.n);
+      wrongSet1 = [correctSet[0], correctSet[1], pick(WINES.filter((w) => w.c !== "Italy")).n];
+      wrongSet2 = [correctSet[0], pick(WINES.filter((w) => w.c !== "Italy")).n, pick(WINES.filter((w) => w.c !== "Italy")).n];
+      wrongSet3 = [correctSet[2], pick(WINES.filter((w) => w.c !== "Italy")).n, correctSet[0]];
+    } else if (mode === "SparklingOnly") {
+      stem = "Pick the set that contains ONLY sparkling wines.";
+      correctSet = shuffle(byType("Sparkling")).slice(0, 3).map((w) => w.n);
+      wrongSet1 = [correctSet[0], correctSet[1], pick(WINES.filter((w) => w.t !== "Sparkling")).n];
+      wrongSet2 = [correctSet[0], pick(WINES.filter((w) => w.t !== "Sparkling")).n, pick(WINES.filter((w) => w.t !== "Sparkling")).n];
+      wrongSet3 = [correctSet[2], pick(WINES.filter((w) => w.t !== "Sparkling")).n, correctSet[0]];
+    } else if (mode === "CabernetOnly") {
+      stem = "Pick the set that contains ONLY Cabernet Sauvignon wines.";
+      const cabs = WINES.filter((w) => w.g === "Cabernet Sauvignon");
+      correctSet = shuffle(cabs).slice(0, 3).map((w) => w.n);
+      wrongSet1 = [correctSet[0], correctSet[1], pick(WINES.filter((w) => w.g !== "Cabernet Sauvignon")).n];
+      wrongSet2 = [correctSet[0], pick(WINES.filter((w) => w.g !== "Cabernet Sauvignon")).n, pick(WINES.filter((w) => w.g !== "Cabernet Sauvignon")).n];
+      wrongSet3 = [correctSet[2], pick(WINES.filter((w) => w.g !== "Cabernet Sauvignon")).n, correctSet[0]];
+    } else {
+      stem = "Pick the set that contains ONLY Pinot Grigio wines.";
+      const pgs = WINES.filter((w) => w.g === "Pinot Grigio");
+      correctSet = shuffle(pgs).slice(0, 3).map((w) => w.n);
+      wrongSet1 = [correctSet[0], correctSet[1], pick(WINES.filter((w) => w.g !== "Pinot Grigio")).n];
+      wrongSet2 = [correctSet[0], pick(WINES.filter((w) => w.g !== "Pinot Grigio")).n, pick(WINES.filter((w) => w.g !== "Pinot Grigio")).n];
+      wrongSet3 = [correctSet[2], pick(WINES.filter((w) => w.g !== "Pinot Grigio")).n, correctSet[0]];
+    }
+
+    const packs = shuffle([correctSet, wrongSet1, wrongSet2, wrongSet3]).map((set) => set.join(" • "));
+    const answer = correctSet.join(" • ");
+
+    return { prompt, stem, context: "", options: packs, answer };
+  }
+
+  function buildQuestions50() {
+    const qs = [];
+    while (qs.length < 50) {
+      const gen = pick([qCorrectPairing, qOddOneOut, qCategoryCheck]);
+      const q = gen();
+
+      // Ensure 4 options and unique options
+      q.options = unique(q.options).slice(0, 4);
+      if (q.options.length < 4) continue;
+
+      // Answer must be in options
+      if (!q.options.includes(q.answer)) continue;
+
+      qs.push(q);
+    }
+    return qs;
+  }
+
+  const QUESTIONS = buildQuestions50();
+
+  // ============ STATE ============
+  const KEY = "wine_test_v3";
+  const loadState = () => {
+    try {
+      const raw = localStorage.getItem(KEY);
+      return raw ? JSON.parse(raw) : null;
+    } catch {
+      return null;
+    }
+  };
+  const saveState = () => localStorage.setItem(KEY, JSON.stringify(state));
+
+  let state = loadState() || {
+    name: "",
+    idx: 0,
+    answers: {}, // { [i]: optionString }
+    started: false,
+    finished: false
+  };
+
+  // ============ RENDER ============
+  function show(section) {
+    if (qSection) qSection.style.display = section === "quiz" ? "block" : "none";
+    if (resultsSection) resultsSection.style.display = section === "results" ? "block" : "none";
+  }
+
+  function renderQuestion() {
+    const i = state.idx;
+    const q = QUESTIONS[i];
+
+    if (qNum) qNum.textContent = `${i + 1} / ${QUESTIONS.length}`;
+    if (qText) {
+      // HARDER: question text does not contain answer
+      // We optionally show a context line (wine name) for pairing questions
+      const ctx = q.context ? `<div class="qContext">${escapeHTML(q.context)}</div>` : "";
+      qText.innerHTML = `
+        <div class="qPrompt">${escapeHTML(q.prompt)}</div>
+        <div class="qStem">${escapeHTML(q.stem || "")}</div>
+        ${ctx}
+      `;
+    }
+
+    // Choices as radio list
+    if (choicesWrap) {
+      choicesWrap.innerHTML = "";
+      const selected = state.answers[i] || "";
+
+      q.options.forEach((opt, idx) => {
+        const id = `opt_${i}_${idx}`;
+        const row = document.createElement("label");
+        row.className = "choiceRow";
+        row.setAttribute("for", id);
+        row.innerHTML = `
+          <input type="radio" name="q${i}" id="${id}" value="${escapeAttr(opt)}" ${selected === opt ? "checked" : ""}/>
+          <span class="choiceText">${escapeHTML(opt)}</span>
+        `;
+        row.addEventListener("click", () => {
+          state.answers[i] = opt;
+          saveState();
+          refreshNavButtons();
+        });
+        choicesWrap.appendChild(row);
+      });
+    }
+
+    refreshNavButtons();
+  }
+
+  function refreshNavButtons() {
+    const i = state.idx;
+    const answered = !!state.answers[i];
+
+    if (backBtn) backBtn.disabled = i === 0;
+    if (nextBtn) {
+      // require answer before next
+      nextBtn.disabled = !answered;
+      nextBtn.textContent = i === QUESTIONS.length - 1 ? "Finish" : "Next →";
+    }
+  }
+
+  function scoreTest() {
+    let correct = 0;
+    for (let i = 0; i < QUESTIONS.length; i++) {
+      if (state.answers[i] && state.answers[i] === QUESTIONS[i].answer) correct++;
+    }
+    const pct = Math.round((correct / QUESTIONS.length) * 100);
+    return { correct, pct };
+  }
+
+  function renderResults() {
+    const { correct, pct } = scoreTest();
+    if (rName) rName.textContent = state.name || "—";
+    if (rScore) rScore.textContent = `${correct} / ${QUESTIONS.length}`;
+    if (rPct) rPct.textContent = `${pct}%`;
+
+    const passed = pct >= PASSING_PCT;
+    if (stamp) stamp.textContent = passed ? "PASS ✅" : "FAIL ❌";
+
+    // Never show answers unless you explicitly allow it
+    if (REVIEW_MODE_AFTER_FINISH) {
+      // optional: could render a review section (not included by default)
+    }
+  }
+
+  function startTest() {
+    const nm = (nameInput?.value || "").trim();
+    if (!nm) {
+      alert("Please enter your name.");
+      return;
+    }
+    state.name = nm;
+    state.started = true;
+    state.finished = false;
+    state.idx = 0;
+    saveState();
+    show("quiz");
+    renderQuestion();
+  }
+
+  function next() {
+    const i = state.idx;
+    if (!state.answers[i]) return;
+
+    if (i === QUESTIONS.length - 1) {
+      // finish
+      state.finished = true;
+      saveState();
+      show("results");
+      renderResults();
+      return;
+    }
+    state.idx++;
+    saveState();
+    renderQuestion();
+  }
+
+  function back() {
+    if (state.idx === 0) return;
+    state.idx--;
+    saveState();
+    renderQuestion();
+  }
+
+  function restart() {
+    if (!confirm("Restart the test? This will clear answers.")) return;
+    state = { name: "", idx: 0, answers: {}, started: false, finished: false };
+    localStorage.removeItem(KEY);
+    if (nameInput) nameInput.value = "";
+    show("quiz");
+    if (qSection) qSection.style.display = "none";
+    if (resultsSection) resultsSection.style.display = "none";
+  }
+
+  // ============ ESCAPE HELPERS ============
+  function escapeHTML(s) {
+    return String(s).replace(/[&<>"']/g, (m) => ({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;" }[m]));
+  }
+  function escapeAttr(s) {
+    return String(s).replace(/"/g, "&quot;");
+  }
+
+  // ============ WIRE UP ============
+  if (startBtn) startBtn.addEventListener("click", startTest);
+  if (nextBtn) nextBtn.addEventListener("click", next);
+  if (backBtn) backBtn.addEventListener("click", back);
+  if (restartBtn) restartBtn.addEventListener("click", restart);
+
+  // ============ BOOT ============
+  // If they were mid-test, resume
+  if (state.started && !state.finished) {
+    show("quiz");
+    renderQuestion();
+  } else if (state.finished) {
+    show("results");
+    renderResults();
   } else {
-    stamp.textContent = "FAIL";
-    stamp.classList.add("fail");
+    // initial
+    if (qSection) qSection.style.display = "none";
+    if (resultsSection) resultsSection.style.display = "none";
   }
-
-  hide(quiz);
-  show(results);
-}
-
-// ====== EVENTS ======
-startBtn.addEventListener("click", () => {
-  introError.textContent = "";
-  name = (nameInput.value || "").trim();
-
-  if (!name){
-    introError.textContent = "Please enter your name to begin.";
-    return;
-  }
-
-  namePill.textContent = name;
-
-  hide(intro);
-  show(quiz);
-  idx = 0;
-  render();
-});
-
-backBtn.addEventListener("click", () => {
-  quizError.textContent = "";
-  if (idx > 0){
-    idx--;
-    render();
-  }
-});
-
-nextBtn.addEventListener("click", () => {
-  if (answers[idx] === null){
-    quizError.textContent = "Pick an answer before continuing.";
-    return;
-  }
-  quizError.textContent = "";
-
-  if (idx === QUESTIONS.length - 1){
-    finish();
-  } else {
-    idx++;
-    render();
-  }
-});
-
-restartBtn.addEventListener("click", () => {
-  // reset
-  idx = 0;
-  name = "";
-  answers = new Array(QUESTIONS.length).fill(null);
-
-  nameInput.value = "";
-  namePill.textContent = "—";
-  introError.textContent = "";
-  quizError.textContent = "";
-
-  hide(results);
-  hide(quiz);
-  show(intro);
-});
+})();
