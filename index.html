@@ -1,79 +1,78 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Wine Knowledge Test</title>
-
-  <!-- ABSOLUTE PATHS for GitHub Pages project sites -->
-  <link rel="stylesheet" href="/Wine-test/style.css?v=1" />
-  <script src="/Wine-test/app.js?v=1" defer></script>
+  <link rel="stylesheet" href="./css/style.css" />
 </head>
-
 <body>
+  <div class="bgGlow"></div>
+
   <main class="wrap">
     <header class="hero">
-      <div class="brand">
-        <div class="logo">🍷</div>
-        <div>
-          <h1>Wine Knowledge Test</h1>
-          <p class="sub">50 questions • Easy–Moderate • 80% to pass</p>
-        </div>
+      <div class="heroIcon" aria-hidden="true">🍷</div>
+      <div class="heroText">
+        <h1>Wine Knowledge Test</h1>
+        <p class="sub">50 questions • Easy–Moderate+ • <strong>80%</strong> to pass</p>
       </div>
-
-      <!-- THIS MUST TURN GREEN if JS loads -->
-      <div id="statusPill" class="status red">JS: Not loaded</div>
     </header>
 
-    <section id="intro" class="card">
+    <section class="card" id="startCard">
       <h2>Start</h2>
-      <p class="muted">Enter your name, press <b>Start Test</b>. When finished, screenshot your results.</p>
+      <p class="muted">
+        Enter your name, press <strong>Start Test</strong>. When finished, screenshot your results.
+      </p>
 
-      <div class="formRow">
-        <label for="nameInput">Your Name</label>
-        <input id="nameInput" type="text" placeholder="First + Last name" autocomplete="name" />
+      <div class="row">
+        <label class="label" for="nameInput">Your Name</label>
+        <input id="nameInput" class="input" type="text" placeholder="First + Last name" autocomplete="name" />
       </div>
 
       <div class="btnRow">
         <button id="startBtn" class="btn primary" type="button">Start Test</button>
+        <button id="resetBtnTop" class="btn ghost" type="button" title="Clear saved attempt">Reset</button>
       </div>
 
-      <div id="introError" class="error"></div>
+      <p class="tiny center muted">Local-only. No data is sent anywhere.</p>
     </section>
 
-    <section id="quiz" class="card hidden">
-      <div class="quizTop">
-        <div>
-          <h2 id="qTitle">Question</h2>
-          <p class="muted" id="progress">1 of 50</p>
-        </div>
-        <div class="pill">
-          <span class="pillLabel">Name:</span>
-          <span id="namePill">—</span>
-        </div>
+    <section class="card hidden" id="testCard" aria-live="polite">
+      <div class="testTop">
+        <div class="pill">Name: <span id="whoName">—</span></div>
+        <div class="pill">Progress: <span id="progressText">0/50</span></div>
+      </div>
+
+      <div class="qHeader">
+        <h2 id="qTitle">Question</h2>
+        <div class="muted" id="qCount">1 of 50</div>
       </div>
 
       <div class="questionBox">
-        <h3 id="qText">Loading…</h3>
+        <div id="questionText" class="questionText">Loading…</div>
       </div>
 
-      <div id="choices" class="answers"></div>
+      <form id="optionsForm" class="options" autocomplete="off">
+        <!-- options injected by JS -->
+      </form>
 
       <div class="navRow">
         <button id="backBtn" class="btn" type="button">← Back</button>
         <button id="nextBtn" class="btn primary" type="button">Next →</button>
       </div>
 
-      <div id="quizError" class="error"></div>
+      <div class="btnRow">
+        <button id="finishBtn" class="btn danger hidden" type="button">Finish & Grade</button>
+        <button id="resetBtn" class="btn ghost" type="button">Reset</button>
+      </div>
+
+      <p class="tiny center muted">Tip: You can go back and change answers before finishing.</p>
     </section>
 
-    <section id="results" class="card hidden">
-      <div class="resultsHeader">
-        <div>
-          <h2>Results</h2>
-          <p class="muted">Screenshot this result and send it in.</p>
-        </div>
-        <div id="stamp" class="stamp">PASS</div>
+    <section class="card hidden" id="resultsCard">
+      <div class="resultsTop">
+        <h2>Results</h2>
+        <div id="stamp" class="stamp hidden">PASS</div>
       </div>
 
       <div class="resultsGrid">
@@ -95,14 +94,26 @@
         </div>
       </div>
 
+      <div class="muted small">
+        Screenshot this page and send it to your manager.
+      </div>
+
       <div class="btnRow">
+        <button id="reviewBtn" class="btn" type="button">Review Answers</button>
         <button id="restartBtn" class="btn primary" type="button">Restart</button>
       </div>
+
+      <details class="reviewWrap" id="reviewWrap">
+        <summary>Show missed questions</summary>
+        <div id="missedList" class="missedList"></div>
+      </details>
     </section>
 
-    <footer class="foot">
-      <span class="muted">Local-only. No data is sent anywhere.</span>
+    <footer class="foot muted tiny">
+      Built for training. Local-only. Works on GitHub Pages.
     </footer>
   </main>
+
+  <script src="./js/app.js"></script>
 </body>
 </html>
